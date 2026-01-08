@@ -84,7 +84,7 @@ async function bootstrap() {
     const { tenantMiddleware } = await import('./common/middleware/tenant.middleware')
     app.use(tenantMiddleware)
 
-    const port = process.env.PORT || 3000;
+    const port = process.env.PORT || 3001;
     await app.listen(port, '0.0.0.0');
     console.log(`✅ Backend server started successfully!`)
     console.log(`🚀 API available at: http://localhost:${port}/api`)
