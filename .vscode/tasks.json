@@ -1,0 +1,21 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Backend (NestJS)",
+			"type": "shell",
+			"command": "npx ts-node src/main.ts",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Run Frontend (Next.js)",
+			"type": "shell",
+			"command": "npm run dev --prefix frontend",
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}
