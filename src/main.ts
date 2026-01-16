@@ -24,7 +24,7 @@ async function bootstrap() {
     // Enable CORS with specific configuration
     const defaultOrigins = process.env.NODE_ENV === 'production'
       ? ['https://arwapark.digima.cloud', 'http://arwapark.digima.cloud']
-      : ['http://localhost:3000', 'http://localhost:3002']
+      : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003', 'http://localhost:3004', 'http://localhost:3005']
 
     const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS
       ? process.env.CORS_ALLOWED_ORIGINS.split(',').map(o => o.trim())
