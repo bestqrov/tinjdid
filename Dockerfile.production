@@ -45,7 +45,7 @@ COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 # Copy configuration files
-COPY .env.production .env
+
 COPY frontend/next.config.js ./frontend/
 COPY frontend/public ./frontend/public
 
