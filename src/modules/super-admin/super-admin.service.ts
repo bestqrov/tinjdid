@@ -5,7 +5,7 @@ import { UpdateCompanyStatusDto, AssignPlanDto } from './dto/company.dto';
 
 @Injectable()
 export class SuperAdminService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   // Dashboard Overview
   async getDashboardOverview() {
@@ -102,11 +102,11 @@ export class SuperAdminService {
     // MRR Evolution
     const companiesByMonth = await (this.prisma as any).$queryRaw`
       SELECT 
-        DATE_TRUNC('month', "createdAt") as month,
+        strftime('%Y-%m-01 00:00:00', "createdAt") as month,
         COUNT(*) as count
       FROM "Company"
       WHERE "createdAt" >= ${startDate}
-      GROUP BY DATE_TRUNC('month', "createdAt")
+      GROUP BY month
       ORDER BY month ASC
     `;
 
@@ -190,7 +190,7 @@ export class SuperAdminService {
 
   async getCompanyDetails(id: string) {
     const company = await this.prisma.company.findUnique({
-      where: { id },
+      where: { id: id },
       include: {
         plan: true,
         users: {
@@ -235,7 +235,7 @@ export class SuperAdminService {
 
   async updateCompanyStatus(id: string, dto: UpdateCompanyStatusDto) {
     const company = await this.prisma.company.update({
-      where: { id },
+      where: { id: id },
       data: { status: dto.status },
     });
 
@@ -253,15 +253,14 @@ export class SuperAdminService {
 
   async assignPlanToCompany(id: string, dto: AssignPlanDto) {
     const company = await this.prisma.company.update({
-      where: { id },
+      where: { id: id },
       data: { planId: dto.planId },
-      include: { plan: true },
     });
 
     await this.createActivityLog({
       companyId: id,
       action: 'PLAN_CHANGED',
-      description: `Company plan changed to ${company.plan?.name}`,
+      description: `Company plan changed`,
     });
 
     return company;
@@ -276,7 +275,7 @@ export class SuperAdminService {
 
     // Soft delete by setting status
     return this.prisma.company.update({
-      where: { id },
+      where: { id: id },
       data: { status: 'CANCELED' },
     });
   }
@@ -295,7 +294,7 @@ export class SuperAdminService {
 
   async getPlanDetails(id: string) {
     const plan = await this.prisma.subscriptionPlan.findUnique({
-      where: { id },
+      where: { id: id },
       include: {
         companies: {
           select: {
@@ -320,14 +319,20 @@ export class SuperAdminService {
 
   async createPlan(dto: CreatePlanDto) {
     return this.prisma.subscriptionPlan.create({
-      data: dto,
+      data: {
+        ...dto,
+        modulesEnabled: Array.isArray(dto.modulesEnabled) ? dto.modulesEnabled.join(',') : dto.modulesEnabled,
+      },
     });
   }
 
   async updatePlan(id: string, dto: UpdatePlanDto) {
     return this.prisma.subscriptionPlan.update({
-      where: { id },
-      data: dto,
+      where: { id: id },
+      data: {
+        ...dto,
+        modulesEnabled: Array.isArray(dto.modulesEnabled) ? dto.modulesEnabled.join(',') : dto.modulesEnabled,
+      },
     });
   }
 
@@ -344,7 +349,7 @@ export class SuperAdminService {
     }
 
     return this.prisma.subscriptionPlan.delete({
-      where: { id },
+      where: { id: id },
     });
   }
 
@@ -413,7 +418,7 @@ export class SuperAdminService {
 
   async exportRevenueData(format: string) {
     const revenue = await this.getRevenueByPlan('30');
-    
+
     if (format === 'csv') {
       const csv = [
         'Plan Name,Companies,Monthly Revenue,Yearly Revenue',
@@ -606,7 +611,7 @@ export class SuperAdminService {
         data: {
           platformName: 'ArwaPark',
           defaultLanguage: 'FR',
-          enabledLanguages: ['FR', 'AR', 'EN'],
+          enabledLanguages: JSON.stringify(['FR', 'AR', 'EN']),
         },
       });
     }
@@ -626,7 +631,7 @@ export class SuperAdminService {
   // Password Reset Requests Management
   async getPasswordResetRequests(status?: string) {
     const where = status ? { status } : {};
-    
+
     const requests = await this.prisma.passwordResetRequest.findMany({
       where,
       orderBy: { createdAt: 'desc' },
@@ -640,7 +645,7 @@ export class SuperAdminService {
     body: { response: string; sendEmail: boolean; newPassword?: string }
   ) {
     const request = await this.prisma.passwordResetRequest.findUnique({
-      where: { id },
+      where: { id: id },
     });
 
     if (!request) {
@@ -649,7 +654,7 @@ export class SuperAdminService {
 
     // Update request with response
     await this.prisma.passwordResetRequest.update({
-      where: { id },
+      where: { id: id },
       data: {
         adminResponse: body.response,
         status: 'RESOLVED',
@@ -689,7 +694,8 @@ export class SuperAdminService {
 
   async updatePasswordResetRequestStatus(id: string, status: string) {
     return this.prisma.passwordResetRequest.update({
-      where: { id },
+      where: { id: id },
       data: { status },
     });
-  }}
+  }
+}

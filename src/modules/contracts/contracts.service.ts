@@ -3,7 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service'
 
 @Injectable()
 export class ContractsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   create(companyId: string, data: any, attachmentPath?: string) {
     const payload: any = {
@@ -30,13 +30,13 @@ export class ContractsService {
   }
 
   findAll(companyId: string) {
-    return this.prisma.contract.findMany({ where: { companyId }, include: { collaborator: true, contractType: true } })
+    return this.prisma.contract.findMany({ where: { companyId: companyId } })
   }
 
   findMetadata(companyId: string) {
     return Promise.all([
-      this.prisma.user.findMany({ where: { companyId }, select: { id: true, name: true, email: true } }),
-      this.prisma.contractType.findMany({ where: { companyId } }),
+      this.prisma.user.findMany({ where: { companyId: companyId }, select: { id: true, name: true, email: true } }),
+      this.prisma.contractType.findMany({ where: { companyId: companyId } }),
     ]).then(([collaborators, contractTypes]) => ({ collaborators, contractTypes }))
   }
 }

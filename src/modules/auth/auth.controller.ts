@@ -95,7 +95,7 @@ export class AuthController {
 
   @Post('reset-password')
   async reset(@Body() body: { token: string; password: string }) {
-    const r = await this.prisma.passwordReset.findUnique({ where: { token: body.token }, include: { user: true } })
+    const r = await this.prisma.passwordReset.findUnique({ where: { token: body.token } })
     if (!r) throw new UnauthorizedException('Invalid or expired token')
     if (r.used) throw new UnauthorizedException('Token already used')
     if (new Date(r.expiresAt) < new Date()) throw new UnauthorizedException('Token expired')

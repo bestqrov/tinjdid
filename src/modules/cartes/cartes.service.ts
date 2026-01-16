@@ -7,7 +7,7 @@ export class CartesService {
   constructor(private prisma: PrismaService) { }
 
   async create(companyId: string, dto: CreateCarteDto) {
-    const data: any = { ...dto, companyId };
+    const data: any = { ...dto, companyId: companyId };
     if (dto.vehicle) {
       data.vehicle = { connect: { id: dto.vehicle } };
       delete data.vehicle;
@@ -20,15 +20,13 @@ export class CartesService {
 
   async findAll(companyId: string) {
     return this.prisma.carte.findMany({
-      where: { companyId },
-      include: { vehicle: true, recharges: true },
+      where: { companyId: companyId },
     });
   }
 
   async findOne(id: string, companyId: string) {
     return this.prisma.carte.findFirst({
-      where: { id, companyId },
-      include: { vehicle: true, recharges: true },
+      where: { id: id, companyId: companyId },
     });
   }
 
@@ -40,27 +38,27 @@ export class CartesService {
     }
 
     return this.prisma.carte.updateMany({
-      where: { id, companyId },
+      where: { id: id, companyId: companyId },
       data,
     });
   }
 
   async remove(id: string, companyId: string) {
     return this.prisma.carte.deleteMany({
-      where: { id, companyId },
+      where: { id: id, companyId: companyId },
     });
   }
 
   async activate(id: string, companyId: string) {
     return this.prisma.carte.updateMany({
-      where: { id, companyId },
+      where: { id: id, companyId: companyId },
       data: { status: 'active' },
     });
   }
 
   async deactivate(id: string, companyId: string) {
     return this.prisma.carte.updateMany({
-      where: { id, companyId },
+      where: { id: id, companyId: companyId },
       data: { status: 'inactive' },
     });
   }

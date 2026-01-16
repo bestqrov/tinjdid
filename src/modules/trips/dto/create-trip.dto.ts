@@ -1,5 +1,4 @@
 import { IsDateString, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator'
-import { TripType, TripStatus } from '@prisma/client'
 
 export class CreateTripDto {
   @IsDateString()
@@ -11,8 +10,8 @@ export class CreateTripDto {
   @IsString()
   dropoff: string
 
-  @IsEnum(TripType)
-  tripType: TripType
+  @IsString()
+  tripType: string
 
   @IsOptional()
   @IsString()
@@ -26,6 +25,6 @@ export class CreateTripDto {
   price: number
 
   @IsOptional()
-  @IsEnum(TripStatus)
-  status?: TripStatus
+  @IsString()
+  status?: string
 }

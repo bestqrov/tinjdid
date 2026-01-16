@@ -1,5 +1,4 @@
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator'
-import { QuoteStatus, Currency } from '@prisma/client'
 
 export class CreateQuoteDto {
   @IsOptional()
@@ -9,10 +8,10 @@ export class CreateQuoteDto {
   @IsNumber()
   amount: number
 
-  @IsEnum(Currency)
-  currency: Currency
+  @IsString()
+  currency: string
 
   @IsOptional()
-  @IsEnum(QuoteStatus)
-  status?: QuoteStatus
+  @IsString()
+  status?: string
 }

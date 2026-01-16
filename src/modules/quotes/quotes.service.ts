@@ -3,7 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service'
 
 @Injectable()
 export class QuotesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   create(companyId: string, data: any) {
     const d: any = { ...data }
@@ -17,11 +17,11 @@ export class QuotesService {
   }
 
   findAll(companyId: string) {
-    return this.prisma.quote.findMany({ where: { companyId } })
+    return this.prisma.quote.findMany({ where: { companyId: companyId } })
   }
 
   findOne(id: string) {
-    return this.prisma.quote.findUnique({ where: { id } })
+    return this.prisma.quote.findUnique({ where: { id: id } })
   }
 
   async convertToTrip(quoteId: string) {

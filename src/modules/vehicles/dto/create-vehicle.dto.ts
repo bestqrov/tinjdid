@@ -1,5 +1,4 @@
 import { IsEnum, IsInt, IsOptional, IsString, Min, IsNumber, IsDateString } from 'class-validator'
-import { VehicleType } from '@prisma/client'
 
 export class CreateVehicleDto {
   @IsString()

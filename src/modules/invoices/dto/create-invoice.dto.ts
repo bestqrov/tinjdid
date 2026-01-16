@@ -1,5 +1,4 @@
 import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString, IsArray, IsDateString } from 'class-validator'
-import { InvoiceStatus, Currency } from '@prisma/client'
 
 export class CreateInvoiceDto {
   @IsOptional()
@@ -25,8 +24,8 @@ export class CreateInvoiceDto {
   @IsNumber()
   tvaPercent?: number
 
-  @IsEnum(Currency)
-  currency: Currency
+  @IsString()
+  currency: string
 
   @IsBoolean()
   tva: boolean
@@ -52,6 +51,6 @@ export class CreateInvoiceDto {
   lines?: any[]
 
   @IsOptional()
-  @IsEnum(InvoiceStatus)
-  status?: InvoiceStatus
+  @IsString()
+  status?: string
 }

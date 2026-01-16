@@ -8,106 +8,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Enums
-enum Role {
-  SUPERADMIN
-  COMPANY_ADMIN
-  ADMIN
-  STAFF
-  DRIVER
-  AGENCY
-}
-
-enum VehicleType {
-  VAN
-  BUS
-  VIP
-}
-
-enum TripType {
-  AIRPORT
-  EXCURSION
-  CITY_TOUR
-}
-
-enum TripStatus {
-  PLANNED
-  ONGOING
-  DONE
-  CANCELED
-}
-
-enum Currency {
-  MAD
-  EUR
-}
-
-enum QuoteStatus {
-  DRAFT
-  SENT
-  ACCEPTED
-  REJECTED
-}
-
-enum DemoRequestStatus {
-  NEW
-  CONTACTED
-  CONVERTED
-  REJECTED
-}
-
-enum InvoiceStatus {
-  DRAFT
-  SENT
-  PAID
-  UNPAID
-}
-
-enum ChargeType {
-  FUEL
-  DRIVER
-  TOLL
-  PARKING
-  OTHER
-}
-
-enum SubscriptionStatus {
-  ACTIVE
-  TRIAL
-  SUSPENDED
-  EXPIRED
-  CANCELED
-}
-
-enum PlanType {
-  BASIC
-  PRO
-  ENTERPRISE
-  CUSTOM
-}
-
-enum ActivityLogAction {
-  COMPANY_CREATED
-  COMPANY_SUSPENDED
-  COMPANY_ACTIVATED
-  COMPANY_DELETED
-  PLAN_CHANGED
-  USER_BLOCKED
-  USER_UNBLOCKED
-  PAYMENT_RECEIVED
-  PAYMENT_FAILED
-  SETTINGS_UPDATED
-}
-
 // Models
+
 model Company {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
   name       String
   address    String?
   contact    String?
   timezone   String?
-  status     SubscriptionStatus @default(TRIAL)
-  planId     String?
+  status     String @default("TRIAL")
+  planId     String?   @db.ObjectId
   plan       SubscriptionPlan? @relation(fields: [planId], references: [id])
   trialEndsAt DateTime?
   subscriptionEndsAt DateTime?
@@ -144,9 +54,9 @@ model User {
   email         String         @unique
   password      String
   name          String?
-  role          Role           @default(STAFF)
+  role          String           @default("STAFF")
   phone         String?
-  companyId     String
+  companyId     String         @db.ObjectId
   company       Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
   // Driver-specific fields
   photo         String?
@@ -165,7 +75,7 @@ model User {
 
 model Vehicle {
   id                      String        @id @default(auto()) @map("_id") @db.ObjectId
-  companyId               String
+  companyId               String        @db.ObjectId
   company                 Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   
   // Basic info
@@ -201,7 +111,7 @@ model Vehicle {
   tva                     Float?        @default(0)
   
   // Legacy fields (keep for compatibility)
-  type                    VehicleType?  @default(VAN)
+  type                    String?  @default("VAN")
   seats                   Int?          @default(1)
   plate                   String
   status                  String        @default("ACTIVE")
@@ -222,7 +132,7 @@ model Vehicle {
 
 model Driver {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  companyId     String
+  companyId     String   @db.ObjectId
   company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   name          String
   phone         String
@@ -230,9 +140,9 @@ model Driver {
   email         String?
   address       String?
   cinNumber     String?
-  languages     String[] @default([])
+  languages     String @default("")
   available     Boolean  @default(true)
-  vehicleId     String?
+  vehicleId     String?  @db.ObjectId
   vehicle       Vehicle? @relation(fields: [vehicleId], references: [id])
   driverPhoto   String?
   driverLicense String?
@@ -246,7 +156,7 @@ model Driver {
 
 model ContractType {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  companyId String
+  companyId String    @db.ObjectId
   company   Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   name      String
   createdAt DateTime  @default(now())
@@ -259,12 +169,12 @@ model ContractType {
 
 model Contract {
   id               String    @id @default(auto()) @map("_id") @db.ObjectId
-  companyId        String
+  companyId        String    @db.ObjectId
   company          Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  collaboratorId   String
+  collaboratorId   String    @db.ObjectId
   collaborator     User      @relation(fields: [collaboratorId], references: [id])
   number           String?
-  contractTypeId   String?
+  contractTypeId   String?   @db.ObjectId
   contractType     ContractType? @relation(fields: [contractTypeId], references: [id])
   startDate        DateTime?
   hireDate         DateTime?
@@ -284,20 +194,20 @@ model Contract {
 
 model Trip {
   id           String      @id @default(auto()) @map("_id") @db.ObjectId
-  companyId    String
+  companyId    String      @db.ObjectId
   company      Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
   date         DateTime
   pickup       String
   dropoff      String
-  tripType     TripType
-  vehicleId    String?
+  tripType     String
+  vehicleId    String?     @db.ObjectId
   vehicle      Vehicle?    @relation(fields: [vehicleId], references: [id])
-  driverId     String?
+  driverId     String?     @db.ObjectId
   driver       Driver?     @relation(fields: [driverId], references: [id])
   clientName   String?
   price        Float
-  currency     Currency    @default(MAD)
-  status       TripStatus  @default(PLANNED)
+  currency     String    @default("MAD")
+  status       String  @default("PLANNED")
   // quote and invoice are represented on the child models (Quote, Invoice)
   quote       Quote?
   invoice     Invoice?
@@ -309,15 +219,14 @@ model Trip {
 
 model Quote {
   id         String       @id @default(auto()) @map("_id") @db.ObjectId
-  companyId  String
+  companyId  String       @db.ObjectId
   company    Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  tripId     String?
+  tripId     String?      @unique @db.ObjectId
   trip       Trip?        @relation(fields: [tripId], references: [id])
-  @@unique([tripId])
   pdfUrl     String?
-  status     QuoteStatus  @default(DRAFT)
+  status     String  @default("DRAFT")
   amount     Float
-  currency   Currency     @default(MAD)
+  currency   String     @default("MAD")
   createdAt  DateTime     @default(now())
 
   @@index([companyId, status])
@@ -325,11 +234,10 @@ model Quote {
 
 model Invoice {
   id                String        @id @default(auto()) @map("_id") @db.ObjectId
-  companyId         String
+  companyId         String        @db.ObjectId
   company           Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  tripId            String?
+  tripId            String?       @unique @db.ObjectId
   trip              Trip?         @relation(fields: [tripId], references: [id])
-  @@unique([tripId])
   numero            String?
   date              DateTime?
   clientId          String?
@@ -338,13 +246,13 @@ model Invoice {
   pdfUrl            String?
   amount            Float
   tvaPercent        Float?
-  currency          Currency      @default(MAD)
+  currency          String      @default("MAD")
   tva               Boolean       @default(false)
   numeroAttestation String?
   dateDelivrance    DateTime?
   periodeFacturation String?
-  lines             Json?
-  status            InvoiceStatus @default(DRAFT)
+  lines             String?
+  status            String @default("DRAFT")
   createdAt         DateTime      @default(now())
 
   @@index([companyId, status])
@@ -352,14 +260,14 @@ model Invoice {
 
 model Charge {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  companyId  String
+  companyId  String    @db.ObjectId
   company    Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  tripId     String?
+  tripId     String?   @db.ObjectId
   trip       Trip?     @relation(fields: [tripId], references: [id])
-  type       ChargeType
+  type       String
   description String?
   amount     Float
-  currency   Currency  @default(MAD)
+  currency   String  @default("MAD")
   date       DateTime
   createdAt  DateTime  @default(now())
 
@@ -369,7 +277,7 @@ model Charge {
 model RefreshToken {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   token     String   @unique
-  userId    String
+  userId    String   @db.ObjectId
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())
@@ -380,7 +288,7 @@ model RefreshToken {
 model PasswordReset {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   token     String   @unique
-  userId    String
+  userId    String   @db.ObjectId
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   used      Boolean  @default(false)
@@ -406,9 +314,9 @@ model PasswordResetRequest {
 // Consommation Models
 model Carburant {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  companyId     String
+  companyId     String    @db.ObjectId
   company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  vehicleId     String?
+  vehicleId     String?   @db.ObjectId
   vehicle       Vehicle?  @relation(fields: [vehicleId], references: [id])
   collaborator  String?
   number        String?
@@ -437,9 +345,9 @@ model Carburant {
 
 model Autoroute {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  companyId     String
+  companyId     String    @db.ObjectId
   company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  vehicleId     String?
+  vehicleId     String?   @db.ObjectId
   vehicle       Vehicle?  @relation(fields: [vehicleId], references: [id])
   collaborator  String?
   date          DateTime
@@ -458,7 +366,7 @@ model Autoroute {
 
 model Depense {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  companyId  String
+  companyId  String    @db.ObjectId
   company    Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   date       DateTime
   category   String?
@@ -474,9 +382,9 @@ model Depense {
 
 model Service {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  companyId   String
+  companyId   String    @db.ObjectId
   company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  vehicleId   String?
+  vehicleId   String?   @db.ObjectId
   vehicle     Vehicle?  @relation(fields: [vehicleId], references: [id])
   date        DateTime
   serviceType String?
@@ -492,7 +400,7 @@ model Service {
 
 model FraisGeneraux {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  companyId  String
+  companyId  String    @db.ObjectId
   company    Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   date       DateTime
   category   String?
@@ -507,9 +415,9 @@ model FraisGeneraux {
 
 model RechargeCarte {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  companyId  String
+  companyId  String    @db.ObjectId
   company    Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  carteId    String?
+  carteId    String?   @db.ObjectId
   carte      Carte?    @relation(fields: [carteId], references: [id])
   date       DateTime
   amount     Float
@@ -523,12 +431,12 @@ model RechargeCarte {
 
 model Carte {
   id              String          @id @default(auto()) @map("_id") @db.ObjectId
-  companyId       String
+  companyId       String          @db.ObjectId
   company         Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
   number          String
   type            String?
   holder          String?
-  vehicleId       String?
+  vehicleId       String?         @db.ObjectId
   vehicle         Vehicle?        @relation(fields: [vehicleId], references: [id])
   balance         Float           @default(0)
   status          String          @default("active")
@@ -544,7 +452,7 @@ model Carte {
 // Settings Model
 model CompanyProfile {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  companyId String   @unique
+  companyId String   @unique @db.ObjectId
   company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   logo      String?
   name      String?
@@ -570,7 +478,7 @@ model CompanyProfile {
 
 model AppSettings {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  companyId String   @unique
+  companyId String   @unique @db.ObjectId
   company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   theme     String   @default("light")
   createdAt DateTime @default(now())
@@ -581,15 +489,15 @@ model AppSettings {
 model SubscriptionPlan {
   id             String    @id @default(auto()) @map("_id") @db.ObjectId
   name           String    @unique
-  type           PlanType  @default(BASIC)
+  type           String  @default("BASIC")
   description    String?
   maxUsers       Int       @default(5)
   maxVehicles    Int       @default(10)
   maxTrips       Int       @default(100)
   priceMonthly   Float     @default(0)
   priceYearly    Float     @default(0)
-  features       Json?
-  modulesEnabled String[]  @default([])
+  features       String?
+  modulesEnabled String  @default("")
   isActive       Boolean   @default(true)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
@@ -600,12 +508,12 @@ model SubscriptionPlan {
 
 model ActivityLog {
   id          String            @id @default(auto()) @map("_id") @db.ObjectId
-  companyId   String?
+  companyId   String?           @db.ObjectId
   company     Company?          @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  userId      String?
-  action      ActivityLogAction
+  userId      String?           @db.ObjectId
+  action      String
   description String
-  metadata    Json?
+  metadata    String?
   ipAddress   String?
   userAgent   String?
   createdAt   DateTime          @default(now())
@@ -621,10 +529,10 @@ model PlatformSettings {
   platformLogo          String?
   supportEmail          String?
   defaultLanguage       String   @default("FR")
-  enabledLanguages      String[] @default(["FR", "AR", "EN"])
+  enabledLanguages      String @default("FR,AR,EN")
   maintenanceMode       Boolean  @default(false)
   maintenanceMessage    String?
-  notificationTemplates Json?
+  notificationTemplates String?
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 }
@@ -641,7 +549,7 @@ model SystemHealth {
   memoryUsage     Float?
   diskUsage       Float?
   timestamp       DateTime @default(now())
-  metadata        Json?
+  metadata        String?
 
   @@index([timestamp])
 }
@@ -655,7 +563,7 @@ model DemoRequest {
   fleetSize       String
   interestedPlan  String
   message         String?
-  status          DemoRequestStatus  @default(NEW)
+  status          String  @default("NEW")
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
   

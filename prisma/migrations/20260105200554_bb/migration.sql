@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "Charge" ALTER COLUMN "date" DROP DEFAULT;

@@ -26,8 +26,8 @@ async function main() {
   const v2 = await prisma.vehicle.create({ data: { companyId: company.id, type: 'VIP', seats: 4, plate: 'VIP-01', status: 'ACTIVE', costPerKm: 1.0 } })
 
   // Drivers
-  const d1 = await prisma.driver.create({ data: { companyId: company.id, name: 'Driver One', phone: '+212600000001', languages: ['EN','FR'], available: true, vehicleId: v1.id } })
-  const d2 = await prisma.driver.create({ data: { companyId: company.id, name: 'Driver Two', phone: '+212600000002', languages: ['AR'], available: true } })
+  const d1 = await prisma.driver.create({ data: { companyId: company.id, name: 'Driver One', phone: '+212600000001', languages: ['EN', 'FR'].join(','), available: true, vehicleId: v1.id } })
+  const d2 = await prisma.driver.create({ data: { companyId: company.id, name: 'Driver Two', phone: '+212600000002', languages: ['AR'].join(','), available: true } })
 
   // Trips
   const trip1 = await prisma.trip.create({ data: { companyId: company.id, date: new Date(), pickup: 'Airport Casablanca', dropoff: 'Hotel Demo', tripType: 'AIRPORT', vehicleId: v1.id, driverId: d1.id, clientName: 'Hotel Demo', price: 300, currency: 'MAD', status: 'PLANNED' } })
@@ -37,64 +37,64 @@ async function main() {
   const quote1 = await prisma.quote.create({ data: { companyId: company.id, tripId: trip1.id, amount: 300, currency: 'MAD', status: 'SENT' } })
 
   // Invoice for trip
-  const invoice1 = await prisma.invoice.create({ 
-    data: { 
-      companyId: company.id, 
-      tripId: trip1.id, 
-      amount: 330, 
-      currency: 'MAD', 
+  const invoice1 = await prisma.invoice.create({
+    data: {
+      companyId: company.id,
+      tripId: trip1.id,
+      amount: 330,
+      currency: 'MAD',
       tva: true,
-      tvaPercent: 20, 
+      tvaPercent: 20,
       status: 'SENT',
       numero: 'FAC-2025-001',
       clientName: 'Hotel Demo',
       clientIce: '000123456789012',
-      lines: [
+      lines: JSON.stringify([
         { designation: 'Transport Aéroport', quantite: '1', puHT: '330.00', montantHT: '330.00' }
-      ]
-    } 
+      ])
+    }
   })
 
   // Example invoice matching the design
-  const invoice2 = await prisma.invoice.create({ 
-    data: { 
-      companyId: company.id, 
-      tripId: trip2.id, 
-      amount: 16000.00, 
-      currency: 'MAD', 
+  const invoice2 = await prisma.invoice.create({
+    data: {
+      companyId: company.id,
+      tripId: trip2.id,
+      amount: 16000.00,
+      currency: 'MAD',
       tva: true,
-      tvaPercent: 20, 
+      tvaPercent: 20,
       status: 'SENT',
       numero: '0004BA/34',
       date: new Date('2025-12-01'),
       dateDelivrance: new Date('2025-12-01'),
       clientName: 'STE ISLANE MANGANESE SARL',
       clientIce: '002987654321098',
-      lines: [
+      lines: JSON.stringify([
         { designation: 'Travaux de fonçage', quantite: '150', puHT: '80.00', montantHT: '12000.00' },
         { designation: 'Exploitation minière', quantite: '40', puHT: '100.00', montantHT: '4000.00' }
-      ]
-    } 
+      ])
+    }
   })
 
   // Another example invoice
-  const invoice3 = await prisma.invoice.create({ 
-    data: { 
-      companyId: company.id, 
-      amount: 20000.00, 
-      currency: 'MAD', 
+  const invoice3 = await prisma.invoice.create({
+    data: {
+      companyId: company.id,
+      amount: 20000.00,
+      currency: 'MAD',
       tva: true,
-      tvaPercent: 20, 
+      tvaPercent: 20,
       status: 'DRAFT',
       numero: '0005BA/34',
       date: new Date('2026-01-03'),
       dateDelivrance: new Date('2026-01-03'),
       clientName: 'STE CONSTRUCTION ABC',
       clientIce: '001234567890123',
-      lines: [
+      lines: JSON.stringify([
         { designation: 'Services de construction', quantite: '200', puHT: '100.00', montantHT: '20000.00' }
-      ]
-    } 
+      ])
+    }
   })
 
   // Charges

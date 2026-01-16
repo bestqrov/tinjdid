@@ -1,6 +1,17 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: arwa
+      POSTGRES_DB: arwapark
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   app:
     build:
       context: .
@@ -19,4 +30,5 @@ services:
     restart: always
 
 volumes:
+  postgres_data:
   app_uploads: # Coolify will manage this volume automatically

@@ -14,7 +14,7 @@ export class SettingsController {
   // Company Profile
   @Get('company-profile')
   async getCompanyProfile(@Req() req: any) {
-    return this.settingsService.getCompanyProfile(req.companyId);
+    return this.settingsService.getCompanyProfile(req.user.companyId);
   }
 
   @Put('company-profile')
@@ -30,40 +30,40 @@ export class SettingsController {
     }),
   )
   async updateCompanyProfile(@Req() req: any, @Body() dto: UpdateCompanyProfileDto, @UploadedFile() file?: Express.Multer.File) {
-    return this.settingsService.updateCompanyProfile(req.companyId, dto, file);
+    return this.settingsService.updateCompanyProfile(req.user.companyId, dto, file);
   }
 
   // Appearance Settings
   @Get('appearance')
   async getAppearance(@Req() req: any) {
-    return this.settingsService.getAppearance(req.companyId);
+    return this.settingsService.getAppearance(req.user.companyId);
   }
 
   @Put('appearance')
   async updateAppearance(@Req() req: any, @Body() dto: UpdateAppearanceDto) {
-    return this.settingsService.updateAppearance(req.companyId, dto);
+    return this.settingsService.updateAppearance(req.user.companyId, dto);
   }
 
   // Backup Settings
   @Get('backup')
   async getBackup(@Req() req: any) {
-    return this.settingsService.getBackup(req.companyId);
+    return this.settingsService.getBackup(req.user.companyId);
   }
 
   @Put('backup')
   async updateBackup(@Req() req: any, @Body() dto: UpdateBackupDto) {
-    return this.settingsService.updateBackup(req.companyId, dto);
+    return this.settingsService.updateBackup(req.user.companyId, dto);
   }
 
   // Security Settings
   @Get('security')
   async getSecurity(@Req() req: any) {
-    return this.settingsService.getSecurity(req.companyId);
+    return this.settingsService.getSecurity(req.user.companyId);
   }
 
   @Put('security')
   async updateSecurity(@Req() req: any, @Body() dto: UpdateSecurityDto) {
-    return this.settingsService.updateSecurity(req.companyId, dto);
+    return this.settingsService.updateSecurity(req.user.companyId, dto);
   }
 
   // System Info

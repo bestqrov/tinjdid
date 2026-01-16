@@ -11,7 +11,7 @@ export class DemoRequestsService {
     private prisma: PrismaService,
     private emailService: EmailService,
     private whatsappService: WhatsAppService,
-  ) {}
+  ) { }
 
   async create(createDemoRequestDto: CreateDemoRequestDto) {
     const demoRequest = await this.prisma.demoRequest.create({
@@ -32,7 +32,7 @@ export class DemoRequestsService {
 
   async findAll(status?: string) {
     const where = status ? { status: status as any } : {}
-    
+
     return this.prisma.demoRequest.findMany({
       where,
       orderBy: { createdAt: 'desc' },
@@ -41,7 +41,7 @@ export class DemoRequestsService {
 
   async findOne(id: string) {
     const demoRequest = await this.prisma.demoRequest.findUnique({
-      where: { id },
+      where: { id: id },
     })
 
     if (!demoRequest) {
@@ -55,7 +55,7 @@ export class DemoRequestsService {
     await this.findOne(id) // Check if exists
 
     return this.prisma.demoRequest.update({
-      where: { id },
+      where: { id: id },
       data: updateDemoRequestDto,
     })
   }
@@ -64,7 +64,7 @@ export class DemoRequestsService {
     await this.findOne(id) // Check if exists
 
     return this.prisma.demoRequest.delete({
-      where: { id },
+      where: { id: id },
     })
   }
 

@@ -1,19 +1,18 @@
 import { IsEnum, IsNumber, IsOptional, IsString, IsDateString } from 'class-validator'
-import { ChargeType, Currency } from '@prisma/client'
 
 export class CreateChargeDto {
   @IsOptional()
   @IsString()
   tripId?: string
 
-  @IsEnum(ChargeType)
-  type: ChargeType
+  @IsString()
+  type: string
 
   @IsNumber()
   amount: number
 
-  @IsEnum(Currency)
-  currency: Currency
+  @IsString()
+  currency: string
 
   @IsOptional()
   @IsString()

@@ -12,7 +12,7 @@ export class SettingsService {
   // Company Profile
   async getCompanyProfile(companyId: string) {
     const profile = await this.prisma.companyProfile.findUnique({
-      where: { companyId },
+      where: { companyId: companyId },
     });
 
     return {
@@ -63,7 +63,7 @@ export class SettingsService {
     }
 
     const profile = await this.prisma.companyProfile.upsert({
-      where: { companyId },
+      where: { companyId: companyId },
       update: {
         logo: logoPath,
         name: dto.name,
@@ -84,7 +84,7 @@ export class SettingsService {
         compteBancaire: dto.compteBancaire,
       },
       create: {
-        companyId,
+        companyId: companyId,
         logo: logoPath,
         name: dto.name,
         gerantNom: dto.gerantNom,
@@ -114,12 +114,12 @@ export class SettingsService {
   // Appearance Settings
   async getAppearance(companyId: string) {
     let settings = await this.prisma.appSettings.findUnique({
-      where: { companyId },
+      where: { companyId: companyId },
     });
 
     if (!settings) {
       settings = await this.prisma.appSettings.create({
-        data: { companyId, theme: 'light' },
+        data: { companyId: companyId, theme: 'light' },
       });
     }
 
@@ -131,9 +131,9 @@ export class SettingsService {
 
   async updateAppearance(companyId: string, dto: UpdateAppearanceDto) {
     const settings = await this.prisma.appSettings.upsert({
-      where: { companyId },
+      where: { companyId: companyId },
       update: { theme: dto.theme },
-      create: { companyId, theme: dto.theme },
+      create: { companyId: companyId, theme: dto.theme },
     });
 
     return {

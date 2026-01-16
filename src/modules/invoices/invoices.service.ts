@@ -3,7 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service'
 
 @Injectable()
 export class InvoicesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   create(companyId: string, data: any) {
     const d: any = { ...data }
@@ -24,11 +24,11 @@ export class InvoicesService {
   }
 
   findAll(companyId: string) {
-    return this.prisma.invoice.findMany({ where: { companyId } })
+    return this.prisma.invoice.findMany({ where: { companyId: companyId } })
   }
 
   findOne(id: string) {
-    return this.prisma.invoice.findUnique({ where: { id } })
+    return this.prisma.invoice.findUnique({ where: { id: id } })
   }
 
   update(id: string, data: any) {
@@ -45,10 +45,10 @@ export class InvoicesService {
       d.dateDelivrance = new Date(d.dateDelivrance)
     }
     delete d.companyId
-    return this.prisma.invoice.update({ where: { id }, data: d })
+    return this.prisma.invoice.update({ where: { id: id }, data: d })
   }
 
   remove(id: string) {
-    return this.prisma.invoice.delete({ where: { id } })
+    return this.prisma.invoice.delete({ where: { id: id } })
   }
 }

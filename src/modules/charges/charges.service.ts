@@ -3,7 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service'
 
 @Injectable()
 export class ChargesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   create(companyId: string, data: any) {
     const d: any = { ...data }
@@ -17,10 +17,10 @@ export class ChargesService {
   }
 
   findAll(companyId: string) {
-    return this.prisma.charge.findMany({ where: { companyId } })
+    return this.prisma.charge.findMany({ where: { companyId: companyId } })
   }
 
   findForTrip(tripId: string) {
-    return this.prisma.charge.findMany({ where: { tripId } })
+    return this.prisma.charge.findMany({ where: { tripId: tripId } })
   }
 }

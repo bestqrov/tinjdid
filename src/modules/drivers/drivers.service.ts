@@ -4,7 +4,7 @@ import { CreateDriverDto } from './dto/create-driver.dto'
 
 @Injectable()
 export class DriversService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   create(companyId: string, data: CreateDriverDto) {
     const d: any = { ...data, role: 'DRIVER' }
@@ -16,7 +16,7 @@ export class DriversService {
   findAll(companyId: string) {
     return this.prisma.user.findMany({
       where: {
-        companyId,
+        companyId: companyId,
         role: 'DRIVER'
       },
       select: {
@@ -37,7 +37,7 @@ export class DriversService {
 
   findOne(id: string) {
     return this.prisma.user.findUnique({
-      where: { id },
+      where: { id: id },
       select: {
         id: true,
         name: true,
@@ -56,7 +56,7 @@ export class DriversService {
 
   update(id: string, data: Partial<CreateDriverDto>) {
     return this.prisma.user.update({
-      where: { id },
+      where: { id: id },
       data,
       select: {
         id: true,
@@ -75,7 +75,7 @@ export class DriversService {
   }
 
   remove(id: string) {
-    return this.prisma.user.delete({ where: { id } })
+    return this.prisma.user.delete({ where: { id: id } })
   }
 
   getMyProfile(userId: string) {

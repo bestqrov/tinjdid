@@ -4,7 +4,7 @@ import { CreateCompanyDto } from './dto/create-company.dto'
 
 @Injectable()
 export class CompaniesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   create(data: CreateCompanyDto) {
     // Set trial period to 15 days if status is TRIAL
@@ -23,14 +23,14 @@ export class CompaniesService {
   }
 
   findOne(id: string) {
-    return this.prisma.company.findUnique({ where: { id } })
+    return this.prisma.company.findUnique({ where: { id: id } })
   }
 
   update(id: string, data: Partial<CreateCompanyDto>) {
-    return this.prisma.company.update({ where: { id }, data })
+    return this.prisma.company.update({ where: { id: id }, data })
   }
 
   remove(id: string) {
-    return this.prisma.company.delete({ where: { id } })
+    return this.prisma.company.delete({ where: { id: id } })
   }
 }

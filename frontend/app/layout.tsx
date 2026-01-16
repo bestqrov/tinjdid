@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <title>ArwaPark</title>
         <meta name="description" content="ArwaPark - Gestion de parc automobile" />
       </head>
-      <body>
+      <body suppressHydrationWarning={true}>
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
             {hideShell ? (

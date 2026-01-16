@@ -4,13 +4,13 @@ import { CreateCarburantDto, CreateAutoRouteDto, CreateDepenseDto, CreateService
 
 @Injectable()
 export class ConsommationService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   // Carburant methods
   async createCarburant(companyId: string, dto: CreateCarburantDto, file?: Express.Multer.File) {
     const data: any = {
       ...dto,
-      companyId,
+      companyId: companyId,
       date: new Date(dto.date),
       attachment: file?.filename,
     };
@@ -26,15 +26,13 @@ export class ConsommationService {
 
   async getAllCarburant(companyId: string) {
     return this.prisma.carburant.findMany({
-      where: { companyId },
-      include: { vehicle: true },
+      where: { companyId: companyId },
     });
   }
 
   async getCarburantById(id: string, companyId: string) {
     return this.prisma.carburant.findFirst({
-      where: { id, companyId },
-      include: { vehicle: true },
+      where: { id: id, companyId: companyId },
     });
   }
 
@@ -52,14 +50,14 @@ export class ConsommationService {
     }
 
     return this.prisma.carburant.updateMany({
-      where: { id, companyId },
+      where: { id: id, companyId: companyId },
       data,
     });
   }
 
   async deleteCarburant(id: string, companyId: string) {
     return this.prisma.carburant.deleteMany({
-      where: { id, companyId },
+      where: { id: id, companyId: companyId },
     });
   }
 
@@ -67,7 +65,7 @@ export class ConsommationService {
   async createAutoroute(companyId: string, dto: CreateAutoRouteDto, file?: Express.Multer.File) {
     const data: any = {
       ...dto,
-      companyId,
+      companyId: companyId,
       date: new Date(dto.date),
       attachment: file?.filename,
     };
@@ -83,15 +81,13 @@ export class ConsommationService {
 
   async getAllAutoroutes(companyId: string) {
     return this.prisma.autoroute.findMany({
-      where: { companyId },
-      include: { vehicle: true },
+      where: { companyId: companyId },
     });
   }
 
   async getAutorouteById(id: string, companyId: string) {
     return this.prisma.autoroute.findFirst({
-      where: { id, companyId },
-      include: { vehicle: true },
+      where: { id: id, companyId: companyId },
     });
   }
 
@@ -109,14 +105,14 @@ export class ConsommationService {
     }
 
     return this.prisma.autoroute.updateMany({
-      where: { id, companyId },
+      where: { id: id, companyId: companyId },
       data,
     });
   }
 
   async deleteAutoroute(id: string, companyId: string) {
     return this.prisma.autoroute.deleteMany({
-      where: { id, companyId },
+      where: { id: id, companyId: companyId },
     });
   }
 
@@ -125,7 +121,7 @@ export class ConsommationService {
     return this.prisma.depense.create({
       data: {
         ...dto,
-        companyId,
+        companyId: companyId,
         date: new Date(dto.date),
         attachment: file?.filename,
       },
@@ -134,13 +130,13 @@ export class ConsommationService {
 
   async getAllDepenses(companyId: string) {
     return this.prisma.depense.findMany({
-      where: { companyId },
+      where: { companyId: companyId },
     });
   }
 
   async getDepenseById(id: string, companyId: string) {
     return this.prisma.depense.findFirst({
-      where: { id, companyId },
+      where: { id: id, companyId: companyId },
     });
   }
 
@@ -154,14 +150,14 @@ export class ConsommationService {
     }
 
     return this.prisma.depense.updateMany({
-      where: { id, companyId },
+      where: { id: id, companyId: companyId },
       data,
     });
   }
 
   async deleteDepense(id: string, companyId: string) {
     return this.prisma.depense.deleteMany({
-      where: { id, companyId },
+      where: { id: id, companyId: companyId },
     });
   }
 
@@ -169,7 +165,7 @@ export class ConsommationService {
   async createService(companyId: string, dto: CreateServiceDto, file?: Express.Multer.File) {
     const data: any = {
       ...dto,
-      companyId,
+      companyId: companyId,
       date: new Date(dto.date),
       attachment: file?.filename,
     };
@@ -185,15 +181,13 @@ export class ConsommationService {
 
   async getAllServices(companyId: string) {
     return this.prisma.service.findMany({
-      where: { companyId },
-      include: { vehicle: true },
+      where: { companyId: companyId },
     });
   }
 
   async getServiceById(id: string, companyId: string) {
     return this.prisma.service.findFirst({
-      where: { id, companyId },
-      include: { vehicle: true },
+      where: { id: id, companyId: companyId },
     });
   }
 
@@ -211,14 +205,14 @@ export class ConsommationService {
     }
 
     return this.prisma.service.updateMany({
-      where: { id, companyId },
+      where: { id: id, companyId: companyId },
       data,
     });
   }
 
   async deleteService(id: string, companyId: string) {
     return this.prisma.service.deleteMany({
-      where: { id, companyId },
+      where: { id: id, companyId: companyId },
     });
   }
 
@@ -227,7 +221,7 @@ export class ConsommationService {
     return this.prisma.fraisGeneraux.create({
       data: {
         ...dto,
-        companyId,
+        companyId: companyId,
         date: new Date(dto.date),
         attachment: file?.filename,
       },
@@ -236,13 +230,13 @@ export class ConsommationService {
 
   async getAllFraisGeneraux(companyId: string) {
     return this.prisma.fraisGeneraux.findMany({
-      where: { companyId },
+      where: { companyId: companyId },
     });
   }
 
   async getFraisGenerauxById(id: string, companyId: string) {
     return this.prisma.fraisGeneraux.findFirst({
-      where: { id, companyId },
+      where: { id: id, companyId: companyId },
     });
   }
 
@@ -256,14 +250,14 @@ export class ConsommationService {
     }
 
     return this.prisma.fraisGeneraux.updateMany({
-      where: { id, companyId },
+      where: { id: id, companyId: companyId },
       data,
     });
   }
 
   async deleteFraisGeneraux(id: string, companyId: string) {
     return this.prisma.fraisGeneraux.deleteMany({
-      where: { id, companyId },
+      where: { id: id, companyId: companyId },
     });
   }
 
@@ -271,7 +265,7 @@ export class ConsommationService {
   async createRechargeCartes(companyId: string, dto: CreateRechargeCarteDto) {
     const data: any = {
       ...dto,
-      companyId,
+      companyId: companyId,
       date: new Date(dto.date),
     };
     if (dto.card) {
@@ -286,15 +280,13 @@ export class ConsommationService {
 
   async getAllRechargesCartes(companyId: string) {
     return this.prisma.rechargeCarte.findMany({
-      where: { companyId },
-      include: { carte: true },
+      where: { companyId: companyId },
     });
   }
 
   async getRechargeCartesById(id: string, companyId: string) {
     return this.prisma.rechargeCarte.findFirst({
-      where: { id, companyId },
-      include: { carte: true },
+      where: { id: id, companyId: companyId },
     });
   }
 
@@ -309,21 +301,21 @@ export class ConsommationService {
     }
 
     return this.prisma.rechargeCarte.updateMany({
-      where: { id, companyId },
+      where: { id: id, companyId: companyId },
       data,
     });
   }
 
   async deleteRechargeCartes(id: string, companyId: string) {
     return this.prisma.rechargeCarte.deleteMany({
-      where: { id, companyId },
+      where: { id: id, companyId: companyId },
     });
   }
 
   // Cartes methods
   async getAllCartes(companyId: string) {
     return this.prisma.carte.findMany({
-      where: { companyId },
+      where: { companyId: companyId },
     });
   }
 }
