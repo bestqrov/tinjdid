@@ -1,8 +1,11 @@
 
 # Stage 1: Builder
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 
 WORKDIR /app
+
+# Install OpenSSL (required for Prisma on slim images)
+RUN apt-get update -y && apt-get install -y openssl
 
 # Copy package files
 COPY package*.json ./
@@ -25,9 +28,12 @@ RUN npm run build
 RUN cd frontend && npm run build
 
 # Stage 2: Production
-FROM node:20-alpine
+FROM node:20-slim
 
 WORKDIR /app
+
+# Install OpenSSL (required for Prisma on slim images)
+RUN apt-get update -y && apt-get install -y openssl
 
 # Copy package files
 COPY package*.json ./
@@ -39,15 +45,16 @@ RUN cd frontend && npm ci --only=production
 
 # Copy built artifacts from builder
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/frontend/.next ./frontend/.next
+# Copy static export "out" folder instead of ".next"
+COPY --from=builder /app/frontend/out ./frontend/out
+# Keep public folder copy just in case, though out contains everything usually
 COPY --from=builder /app/frontend/public ./frontend/public
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 # Copy configuration files
-
+# Removed .env copy as per previous fix
 COPY frontend/next.config.js ./frontend/
-COPY frontend/public ./frontend/public
 
 # Expose port
 EXPOSE 3000
