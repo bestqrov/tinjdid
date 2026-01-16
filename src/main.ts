@@ -6,11 +6,14 @@ import { NestExpressApplication } from '@nestjs/platform-express'
 import { join } from 'path'
 import { existsSync } from 'fs'
 import * as multer from 'multer'
+import { CustomLogger } from './common/logger/custom.logger'
 
 async function bootstrap() {
   try {
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-      logger: ['error', 'warn', 'log'],
+      logger: process.env.NODE_ENV === 'production' ? new CustomLogger() : ['error', 'warn', 'log'],
+      bufferLogs: true,
+      abortOnError: false,
     })
 
     app.setGlobalPrefix('api')
