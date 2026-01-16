@@ -1,0 +1,56 @@
+
+# Stage 1: Builder
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY frontend/package*.json ./frontend/
+
+# Install dependencies
+RUN npm install
+RUN cd frontend && npm install
+
+# Copy source code
+COPY . .
+
+# Generate Prisma Client
+RUN npx prisma generate
+
+# Build backend
+RUN npm run build
+
+# Build frontend
+RUN cd frontend && npm run build
+
+# Stage 2: Production
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY frontend/package*.json ./frontend/
+
+# Install production dependencies only
+RUN npm ci --only=production
+RUN cd frontend && npm ci --only=production
+
+# Copy built artifacts from builder
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/frontend/.next ./frontend/.next
+COPY --from=builder /app/frontend/public ./frontend/public
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+
+# Copy configuration files
+COPY .env.production .env
+COPY frontend/next.config.js ./frontend/
+COPY frontend/public ./frontend/public
+
+# Expose port
+EXPOSE 3000
+
+# Start application
+CMD ["npm", "run", "start"]
