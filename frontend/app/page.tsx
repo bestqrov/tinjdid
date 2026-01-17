@@ -1,11 +1,13 @@
-import type { Metadata } from 'next'
-import { redirect } from 'next/navigation'
-
-export const metadata: Metadata = {
-  title: 'ArwaPark - Touristic Transport Fleet Management',
-  description: 'Professional fleet management software for touristic transport companies in Morocco',
-}
+'use client'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
-  redirect('/login')
+  const router = useRouter()
+
+  useEffect(() => {
+    router.replace('/login')
+  }, [router])
+
+  return null
 }
