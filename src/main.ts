@@ -15,10 +15,7 @@ async function bootstrap() {
     const dev = process.env.NODE_ENV !== 'production'
     const nextApp = next({
       dev,
-      dir: join(process.cwd(), 'frontend'),
-      conf: {
-        distDir: '.next',
-      }
+      dir: join(process.cwd(), 'frontend')
     })
     const handle = nextApp.getRequestHandler()
 
