@@ -51,6 +51,11 @@ COPY --from=builder /app/dist ./dist
 # Copy Next.js standard build output
 COPY --from=builder /app/frontend/.next ./frontend/.next
 COPY --from=builder /app/frontend/public ./frontend/public
+# Copy Next.js source files (required for custom server)
+COPY --from=builder /app/frontend/app ./frontend/app
+COPY --from=builder /app/frontend/components ./frontend/components
+COPY --from=builder /app/frontend/lib ./frontend/lib
+COPY --from=builder /app/frontend/marketing ./frontend/marketing
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
