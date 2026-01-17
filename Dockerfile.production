@@ -51,9 +51,14 @@ COPY --from=builder /app/frontend/public ./frontend/public
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
+# Copy Prisma schema (required for Prisma Client)
+COPY --from=builder /app/prisma ./prisma
+
 # Copy configuration files
-# Removed .env copy as per previous fix
 COPY frontend/next.config.js ./frontend/
+
+# Create uploads directory
+RUN mkdir -p uploads
 
 # Expose port
 EXPOSE 3000

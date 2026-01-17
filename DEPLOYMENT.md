@@ -1,150 +1,218 @@
-# Guide de Déploiement ArwaPark
+# Deployment Guide
 
-## Prérequis sur le serveur
+## Overview
 
-```bash
-# Installer Node.js 18+
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt-get install -y nodejs
+This application is a full-stack NestJS + Next.js application that can be deployed as a single Docker container.
 
-# Installer PostgreSQL
-sudo apt-get install postgresql postgresql-contrib
+## Architecture
 
-# Installer PM2
-sudo npm install -g pm2
+- **Backend**: NestJS API server (Port 3000/3001)
+- **Frontend**: Next.js application (served by NestJS)
+- **Database**: MongoDB (external service)
+- **Global API Prefix**: `/api`
 
-# Installer Nginx
-sudo apt-get install nginx
+## Important Routes
 
-# Installer Git
-sudo apt-get install git
+- `/` - Root route (serves frontend or API info)
+- `/health` - Health check endpoint
+- `/api` - API information
+- `/api/*` - All API endpoints
+
+## Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```env
+# Database
+DATABASE_URL="mongodb+srv://username:password@cluster.mongodb.net/dbname"
+
+# JWT Secrets
+JWT_SECRET="your-secret-key-change-in-production"
+JWT_REFRESH_SECRET="your-refresh-secret-change-in-production"
+JWT_EXPIRES_IN="15m"
+JWT_REFRESH_EXPIRES_IN="7d"
+JWT_REFRESH_EXPIRES_MS="604800000"
+
+# Server
+NODE_ENV="production"
+PORT="3000"
+
+# CORS
+CORS_ALLOWED_ORIGINS="https://yourdomain.com,https://www.yourdomain.com"
+
+# Email (Optional)
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT="587"
+SMTP_USER="your-email@gmail.com"
+SMTP_PASS="your-app-password"
 ```
 
-## Configuration de la base de données
+## Deployment Steps
+
+### 1. Build the Docker Image
 
 ```bash
-# Se connecter à PostgreSQL
-sudo -u postgres psql
-
-# Créer la base de données et l'utilisateur
-CREATE DATABASE arwapark_prod;
-CREATE USER arwapark WITH ENCRYPTED PASSWORD 'votre_mot_de_passe';
-GRANT ALL PRIVILEGES ON DATABASE arwapark_prod TO arwapark;
-\q
+docker build -f Dockerfile.production -t arwapark-app:latest .
 ```
 
-## Déploiement
-
-### 1. Cloner le repository
+### 2. Run the Container
 
 ```bash
-cd /var/www
-sudo mkdir arwapark
-sudo chown $USER:$USER arwapark
-cd arwapark
-git clone https://github.com/votre-username/abdoapp.git .
-```
-
-### 2. Configurer les variables d'environnement
-
-```bash
-cp .env.production .env
-nano .env
-```
-
-Modifier les valeurs suivantes:
-- `DATABASE_URL` avec vos informations PostgreSQL
-- `JWT_SECRET` et `JWT_REFRESH_SECRET` avec des valeurs sécurisées
-- `FRONTEND_URL` et `BACKEND_URL` avec votre domaine
-
-### 3. Installer et construire
-
-```bash
-chmod +x deploy.sh
-./deploy.sh
-```
-
-### 4. Configurer Nginx
-
-```bash
-sudo cp nginx.conf /etc/nginx/sites-available/arwapark
-sudo ln -s /etc/nginx/sites-available/arwapark /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl restart nginx
-```
-
-### 5. Configurer SSL avec Let's Encrypt (Recommandé)
-
-```bash
-sudo apt-get install certbot python3-certbot-nginx
-sudo certbot --nginx -d arwapark.digima.cloud
-```
-
-## Commandes utiles
-
-```bash
-# Voir les logs
-pm2 logs arwapark
-
-# Redémarrer l'application
-pm2 restart arwapark
-
-# Voir le statut
-pm2 status
-
-# Mettre à jour l'application
-./deploy.sh
-```
-
-## Alternative: Déploiement avec Docker
-
-Si vous préférez utiliser Docker:
-
-```bash
-# Construire l'image
-docker build -f Dockerfile.production -t arwapark .
-
-# Lancer le conteneur
 docker run -d \
-  --name arwapark \
-  -p 3001:3001 \
+  --name arwapark-app \
+  -p 3000:3000 \
   --env-file .env \
-  arwapark
-
-# Avec docker-compose
-docker-compose up -d
+  arwapark-app:latest
 ```
 
-## Configuration DNS
+### 3. Verify Deployment
 
-Pointez votre domaine `arwapark.digima.cloud` vers l'IP de votre serveur:
+Check if the application is running:
 
+```bash
+# Health check
+curl http://localhost:3000/health
+
+# API info
+curl http://localhost:3000/api
+
+# Root route
+curl http://localhost:3000/
 ```
-Type: A
-Name: arwapark
-Value: [IP de votre serveur]
-TTL: 3600
-```
-
-## Vérification
-
-1. Accédez à `https://arwapark.digima.cloud` pour le frontend
-2. Testez l'API à `https://arwapark.digima.cloud/api`
-3. Vérifiez le health check à `https://arwapark.digima.cloud/health`
 
 ## Troubleshooting
 
-### "Cannot GET /"
-- Vérifiez que le backend est lancé: `pm2 status`
-- Vérifiez les logs: `pm2 logs arwapark`
-- Vérifiez la configuration nginx: `sudo nginx -t`
+### Issue: "Cannot GET /"
 
-### Erreur de base de données
-- Vérifiez que PostgreSQL est lancé: `sudo systemctl status postgresql`
-- Vérifiez DATABASE_URL dans .env
-- Lancez les migrations: `npx prisma migrate deploy`
+**Cause**: The root route is not properly configured or the frontend build is missing.
 
-### Erreur 502 Bad Gateway
-- Vérifiez que l'application écoute sur le bon port: `netstat -tlnp | grep 3001`
-- Redémarrez PM2: `pm2 restart arwapark`
-- Redémarrez Nginx: `sudo systemctl restart nginx`
+**Solution**:
+1. Ensure the frontend is built during Docker build: `cd frontend && npm run build`
+2. Check that `.next` directory exists in the container
+3. Verify the AppController has a `@Get()` decorator for the root route
+4. Check logs for any build errors
+
+### Issue: Database Connection Failed
+
+**Cause**: MongoDB connection string is incorrect or database is not accessible.
+
+**Solution**:
+1. Verify `DATABASE_URL` in `.env`
+2. Ensure MongoDB cluster allows connections from your deployment IP
+3. Check MongoDB credentials are correct
+4. Run `npx prisma generate` after updating schema
+
+### Issue: CORS Errors
+
+**Cause**: Frontend domain is not in the allowed origins list.
+
+**Solution**:
+1. Add your domain to `CORS_ALLOWED_ORIGINS` in `.env`
+2. Restart the application
+3. Check the CORS configuration in `src/main.ts`
+
+### Issue: File Upload Fails
+
+**Cause**: Uploads directory doesn't exist or has wrong permissions.
+
+**Solution**:
+1. Ensure `uploads` directory is created in Dockerfile
+2. Check directory permissions: `chmod 755 uploads`
+3. Verify multer configuration in `src/main.ts`
+
+## Production Checklist
+
+- [ ] Update `JWT_SECRET` and `JWT_REFRESH_SECRET` with strong random values
+- [ ] Set `NODE_ENV=production`
+- [ ] Configure proper `DATABASE_URL`
+- [ ] Set correct `CORS_ALLOWED_ORIGINS`
+- [ ] Run database migrations: `npm run prisma:migrate:deploy`
+- [ ] Seed initial data if needed: `npm run prisma:seed`
+- [ ] Set up SSL/TLS certificates (use reverse proxy like Nginx)
+- [ ] Configure proper logging and monitoring
+- [ ] Set up automated backups for MongoDB
+- [ ] Test all critical endpoints
+
+## Docker Compose (Alternative)
+
+Create a `docker-compose.yml` file:
+
+```yaml
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: unless-stopped
+    volumes:
+      - ./uploads:/app/uploads
+```
+
+Run with:
+```bash
+docker-compose up -d
+```
+
+## Monitoring
+
+### Health Check
+
+The application provides a health check endpoint at `/health`:
+
+```json
+{
+  "status": "ok",
+  "timestamp": "2026-01-17T16:00:00.000Z",
+  "environment": "production"
+}
+```
+
+### Logs
+
+View application logs:
+
+```bash
+# Docker logs
+docker logs -f arwapark-app
+
+# Docker Compose logs
+docker-compose logs -f app
+```
+
+## Scaling
+
+For production deployments with high traffic:
+
+1. Use a load balancer (e.g., Nginx, HAProxy)
+2. Run multiple container instances
+3. Use a managed MongoDB service (MongoDB Atlas)
+4. Implement Redis for session management
+5. Use CDN for static assets
+
+## Security Recommendations
+
+1. **Never commit `.env` files** - Use environment variables or secrets management
+2. **Use strong JWT secrets** - Generate with `openssl rand -base64 32`
+3. **Enable HTTPS** - Use Let's Encrypt or cloud provider SSL
+4. **Implement rate limiting** - Protect against brute force attacks
+5. **Regular updates** - Keep dependencies up to date
+6. **Database backups** - Automated daily backups
+7. **Monitor logs** - Set up log aggregation and alerting
+
+## Support
+
+For issues or questions:
+- Check the API documentation: `API_DOCUMENTATION.md`
+- Review application logs
+- Contact the development team
+
+---
+
+**Last Updated**: January 17, 2026  
+**Version**: 1.0.0
