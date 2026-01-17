@@ -7,11 +7,11 @@ import { join } from 'path'
 import { existsSync } from 'fs'
 import * as multer from 'multer'
 import { CustomLogger } from './common/logger/custom.logger'
-import next from 'next'
 
 async function bootstrap() {
   try {
-    // Initialize Next.js
+    // Initialize Next.js - use require to avoid ESM/CommonJS issues
+    const next = require('next')
     const dev = process.env.NODE_ENV !== 'production'
     const nextApp = next({
       dev,
