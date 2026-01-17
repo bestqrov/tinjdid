@@ -65,34 +65,21 @@ async function bootstrap() {
 
     app.use(upload.any())
 
-    // Serve Next.js frontend in production
-    // Initialize Next.js (Custom Server)
-    try {
-      const frontendDir = join(process.cwd(), 'frontend');
-      // Require next from the frontend's node_modules to avoid root dependency issues
-      const next = require(join(frontendDir, 'node_modules', 'next'));
-      const dev = process.env.NODE_ENV !== 'production';
-      const nextApp = next({ dev, dir: frontendDir });
-      const handle = nextApp.getRequestHandler();
+    // Serve Next.js static assets
+    const frontendDir = join(process.cwd(), 'frontend')
+    const nextStaticPath = join(frontendDir, '.next', 'static')
+    const publicPath = join(frontendDir, 'public')
 
-      await nextApp.prepare();
-      console.log('✅ Next.js app prepared');
+    // Serve _next/static files
+    if (existsSync(nextStaticPath)) {
+      app.useStaticAssets(nextStaticPath, { prefix: '/_next/static' })
+      console.log(`📦 Serving Next.js static files from: ${nextStaticPath}`)
+    }
 
-      // Middleware to handle Next.js pages (everything except /api)
-      app.use((req, res, next) => {
-        if (req.path.startsWith('/api')) {
-          next();
-        } else {
-          handle(req, res);
-        }
-      });
-    } catch (error) {
-      console.error('❌ Failed to initialize Next.js:', error);
-      // Fallback: Try to serve public only if Next.js fails
-      const frontendPublicPath = join(process.cwd(), 'frontend', 'public');
-      if (existsSync(frontendPublicPath)) {
-        app.useStaticAssets(frontendPublicPath, { prefix: '/' });
-      }
+    // Serve public files
+    if (existsSync(publicPath)) {
+      app.useStaticAssets(publicPath, { prefix: '/' })
+      console.log(`📦 Serving public files from: ${publicPath}`)
     }
 
     // tenant middleware: populate req.companyId from query or user
