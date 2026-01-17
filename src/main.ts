@@ -17,7 +17,7 @@ async function bootstrap() {
     })
 
     app.setGlobalPrefix('api', {
-      exclude: ['/', 'health', 'api', 'api/(.*)'],
+      exclude: ['/', 'health', '*'],
     })
     app.useGlobalPipes(new ValidationPipe({
       whitelist: true,
@@ -29,7 +29,7 @@ async function bootstrap() {
     // Enable CORS with specific configuration
     const defaultOrigins = process.env.NODE_ENV === 'production'
       ? ['https://arwapark.digima.cloud', 'http://arwapark.digima.cloud']
-      : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003', 'http://localhost:3004', 'http://localhost:3005']
+      : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002']
 
     const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS
       ? process.env.CORS_ALLOWED_ORIGINS.split(',').map(o => o.trim())
@@ -90,8 +90,14 @@ async function bootstrap() {
 
     const port = process.env.PORT || 3001;
     await app.listen(port, '0.0.0.0');
+
+    // Determine base URL for logs
+    const baseUrl = process.env.NODE_ENV === 'production'
+      ? 'https://arwapark.digima.cloud'
+      : `http://localhost:${port}`;
+
     console.log(`✅ Backend server started successfully!`)
-    console.log(`🚀 API available at: http://localhost:${port}/api`)
+    console.log(`🚀 API available at: ${baseUrl}/api`)
     console.log(`📁 Uploads directory: ${join(__dirname, '..', 'uploads')}`)
   } catch (error) {
     console.error('❌ Failed to start the backend server:', error)
