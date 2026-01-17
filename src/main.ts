@@ -16,7 +16,9 @@ async function bootstrap() {
       abortOnError: false,
     })
 
-    app.setGlobalPrefix('api')
+    app.setGlobalPrefix('api', {
+      exclude: ['/', 'health', 'api', 'api/(.*)'],
+    })
     app.useGlobalPipes(new ValidationPipe({
       whitelist: true,
       transform: true,
