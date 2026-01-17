@@ -30,6 +30,9 @@ RUN cd frontend && npm run build
 # Stage 2: Production
 FROM node:20-slim
 
+# Set production environment
+ENV NODE_ENV=production
+
 WORKDIR /app
 
 # Install OpenSSL (required for Prisma on slim images)
