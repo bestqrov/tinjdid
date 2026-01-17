@@ -7,9 +7,25 @@ import { join } from 'path'
 import { existsSync } from 'fs'
 import * as multer from 'multer'
 import { CustomLogger } from './common/logger/custom.logger'
+import next from 'next'
 
 async function bootstrap() {
   try {
+    // Initialize Next.js
+    const dev = process.env.NODE_ENV !== 'production'
+    const nextApp = next({
+      dev,
+      dir: join(process.cwd(), 'frontend'),
+      conf: {
+        distDir: '.next',
+      }
+    })
+    const handle = nextApp.getRequestHandler()
+
+    console.log('🔄 Preparing Next.js application...')
+    await nextApp.prepare()
+    console.log('✅ Next.js application ready')
+
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
       logger: process.env.NODE_ENV === 'production' ? new CustomLogger() : ['error', 'warn', 'log'],
       bufferLogs: true,
@@ -88,6 +104,17 @@ async function bootstrap() {
     const { tenantMiddleware } = await import('./common/middleware/tenant.middleware')
     app.use(tenantMiddleware)
 
+    // Add Next.js handler for all non-API routes
+    app.use((req, res, next) => {
+      // Skip Next.js for API routes - let NestJS handle them
+      if (req.path.startsWith('/api')) {
+        return next()
+      }
+
+      // Pass all other routes to Next.js
+      return handle(req, res)
+    })
+
     const port = process.env.PORT || 3001;
     await app.listen(port, '0.0.0.0');
 
@@ -98,10 +125,12 @@ async function bootstrap() {
 
     console.log(`✅ Backend server started successfully!`)
     console.log(`🚀 API available at: ${baseUrl}/api`)
+    console.log(`🌐 Frontend available at: ${baseUrl}`)
     console.log(`📁 Uploads directory: ${join(__dirname, '..', 'uploads')}`)
   } catch (error) {
     console.error('❌ Failed to start the backend server:', error)
     console.error('Error details:', error.message)
+    if (error.stack) console.error('Stack trace:', error.stack)
     process.exit(1)
   }
 }
