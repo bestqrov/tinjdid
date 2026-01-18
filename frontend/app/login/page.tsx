@@ -37,10 +37,17 @@ export default function LoginPage() {
     e.preventDefault()
     setIsLoading(true)
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api'
+      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '')
+      const apiUrl = baseUrl ? `${baseUrl}/api` : '/api'
+
+      console.log('Login Request URL:', `${apiUrl}/auth/login`) // Debug log
+
       const data = await safeFetchJson(`${apiUrl}/auth/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         credentials: 'include',
         body: JSON.stringify({ email, password }),
       })

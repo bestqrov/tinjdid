@@ -107,6 +107,17 @@ async function bootstrap() {
       })
     })
 
+    // Debug Endpoint (Use raw Express instance)
+    const expressApp = app.getHttpAdapter().getInstance()
+    expressApp.post('/api/ping', (req, res) => {
+      res.status(200).json({ message: 'pong', method: req.method })
+    })
+
+    // Handle OPTIONS requests explicitly
+    expressApp.options('*', (req, res) => {
+      res.sendStatus(204)
+    })
+
     // 2. Logging
     app.use((req, res, next) => {
       console.log(`➡️  ${req.method} ${req.path}`)
@@ -151,6 +162,14 @@ async function bootstrap() {
     nextApp.prepare().then(() => {
       isNextReady = true
       console.log('✅ Next.js application ready!')
+
+      // Log connection details
+      const baseUrl = process.env.NODE_ENV === 'production'
+        ? 'https://arwapark.digima.cloud'
+        : `http://localhost:${port}`;
+      console.log(`🚀 API available at: ${baseUrl}/api`)
+      console.log(`🌐 Frontend available at: ${baseUrl}`)
+
     }).catch(err => {
       console.error('❌ Next.js failed to start:', err)
     })
