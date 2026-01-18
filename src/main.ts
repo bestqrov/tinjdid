@@ -116,8 +116,8 @@ async function bootstrap() {
 
     // Add Next.js handler for all non-API routes
     app.use((req, res, next) => {
-      // Skip Next.js for API routes - let NestJS handle them
-      if (req.path.startsWith('/api')) {
+      // Skip Next.js for API routes and health check - let NestJS handle them
+      if (req.path.startsWith('/api') || req.path === '/health') {
         console.log(`⚡ Passing ${req.path} to NestJS Router`)
         return next()
       }
@@ -126,7 +126,7 @@ async function bootstrap() {
       return handle(req, res)
     })
 
-    const port = process.env.PORT || 3001;
+    const port = process.env.PORT || 3000;
     await app.listen(port, '0.0.0.0');
 
     // Determine base URL for logs
