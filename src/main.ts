@@ -24,12 +24,13 @@ async function bootstrap() {
       dev,
       dir: join(process.cwd(), 'frontend')
     })
+
+    // Defer handler creation until after prepare? 
+    // Usually safe to get handler, but we will guard the execution.
     const handle = nextApp.getRequestHandler()
+    let isNextReady = false
 
-    console.log('🔄 Preparing Next.js application...')
-    await nextApp.prepare()
-    console.log('✅ Next.js application ready')
-
+    // Initialize NestJS App first to bind port immediately
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
       logger: process.env.NODE_ENV === 'production' ? new CustomLogger() : ['error', 'warn', 'log'],
       bufferLogs: true,
@@ -44,7 +45,7 @@ async function bootstrap() {
     }))
     app.use(cookieParser())
 
-    // Enable CORS with specific configuration
+    // Enable CORS
     const defaultOrigins = process.env.NODE_ENV === 'production'
       ? ['https://arwapark.digima.cloud', 'http://arwapark.digima.cloud']
       : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002']
@@ -60,7 +61,7 @@ async function bootstrap() {
       allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     })
 
-    // Configure multer for file uploads
+    // Multer Config
     const storage = multer.diskStorage({
       destination: (req, file, cb) => {
         cb(null, join(process.cwd(), 'uploads'))
@@ -73,7 +74,7 @@ async function bootstrap() {
 
     const upload = multer({
       storage,
-      limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+      limits: { fileSize: 5 * 1024 * 1024 },
       fileFilter: (req, file, cb) => {
         if (file.mimetype.startsWith('image/')) {
           cb(null, true)
@@ -83,64 +84,77 @@ async function bootstrap() {
       }
     })
 
-    // app.use(upload.any()) - REMOVED global upload to prevent interference with JSON body parsing
-
-    // Serve Next.js static assets
+    // Serve Static Assets
     const frontendDir = join(process.cwd(), 'frontend')
     const nextStaticPath = join(frontendDir, '.next', 'static')
     const publicPath = join(frontendDir, 'public')
 
-    // Serve _next/static files
-    if (existsSync(nextStaticPath)) {
-      app.useStaticAssets(nextStaticPath, { prefix: '/_next/static' })
-      console.log(`📦 Serving Next.js static files from: ${nextStaticPath}`)
-    }
+    if (existsSync(nextStaticPath)) app.useStaticAssets(nextStaticPath, { prefix: '/_next/static' })
+    if (existsSync(publicPath)) app.useStaticAssets(publicPath, { prefix: '/' })
 
-    // Serve public files
-    if (existsSync(publicPath)) {
-      app.useStaticAssets(publicPath, { prefix: '/' })
-      console.log(`📦 Serving public files from: ${publicPath}`)
-    }
-
-    // tenant middleware: populate req.companyId from query or user
+    // Valid Middlewares
     const { tenantMiddleware } = await import('./common/middleware/tenant.middleware')
     app.use(tenantMiddleware)
 
-    // Direct Health Check (Bypass NestJS Router for reliability)
+    // 1. Direct Health Check (CRITICAL: Must work immediately)
     app.use('/health', (req, res) => {
-      res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() })
+      // If Next.js is still loading, we can still report "ok" but maybe warn?
+      // Load balancer just wants 200 OK.
+      res.status(200).json({
+        status: 'ok',
+        nextReady: isNextReady,
+        timestamp: new Date().toISOString()
+      })
     })
 
-    // Logging middleware for debugging
+    // 2. Logging
     app.use((req, res, next) => {
       console.log(`➡️  ${req.method} ${req.path}`)
       next()
     })
 
-    // Add Next.js handler for all non-API routes
+    // 3. Next.js Handler (Guarded)
     app.use((req, res, next) => {
-      // Skip Next.js for API routes - let NestJS handle them
       if (req.path.startsWith('/api')) {
         console.log(`⚡ Passing ${req.path} to NestJS Router`)
         return next()
       }
 
-      // Pass all other routes to Next.js
+      // If Next.js isn't ready yet, show a friendly loading page
+      if (!isNextReady) {
+        res.status(503).send(`
+          <html>
+            <head><meta http-equiv="refresh" content="2"></head>
+            <body style="font-family:sans-serif; display:flex; justify-content:center; align-items:center; height:100vh;">
+              <div style="text-align:center">
+                <h2>Application is starting...</h2>
+                <p>Please wait...</p>
+              </div>
+            </body>
+          </html>
+        `)
+        return
+      }
+
       return handle(req, res)
     })
 
     const port = process.env.PORT || 3000;
+
+    // START SERVER FIRST
     await app.listen(port, '0.0.0.0');
 
-    // Determine base URL for logs
-    const baseUrl = process.env.NODE_ENV === 'production'
-      ? 'https://arwapark.digima.cloud'
-      : `http://localhost:${port}`;
+    console.log(`✅ Backend server listening on port ${port}`)
+    console.log('🔄 Starting Next.js initialization in background...')
 
-    console.log(`✅ Backend server started successfully!`)
-    console.log(`🚀 API available at: ${baseUrl}/api`)
-    console.log(`🌐 Frontend available at: ${baseUrl}`)
-    console.log(`📁 Uploads directory: ${join(__dirname, '..', 'uploads')}`)
+    // Initialize Next.js in Background
+    nextApp.prepare().then(() => {
+      isNextReady = true
+      console.log('✅ Next.js application ready!')
+    }).catch(err => {
+      console.error('❌ Next.js failed to start:', err)
+    })
+
   } catch (error) {
     console.error('❌ Failed to start the backend server:', error)
     console.error('Error details:', error.message)
@@ -148,6 +162,8 @@ async function bootstrap() {
     process.exit(1)
   }
 }
+
+
 
 bootstrap().catch((error) => {
   console.error('❌ Bootstrap failed:', error)
