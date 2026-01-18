@@ -85,7 +85,7 @@ async function bootstrap() {
       }
     })
 
-    app.use(upload.any())
+    // app.use(upload.any()) - REMOVED global upload to prevent interference with JSON body parsing
 
     // Serve Next.js static assets
     const frontendDir = join(process.cwd(), 'frontend')
@@ -108,10 +108,17 @@ async function bootstrap() {
     const { tenantMiddleware } = await import('./common/middleware/tenant.middleware')
     app.use(tenantMiddleware)
 
+    // Logging middleware for debugging
+    app.use((req, res, next) => {
+      console.log(`➡️  ${req.method} ${req.path}`)
+      next()
+    })
+
     // Add Next.js handler for all non-API routes
     app.use((req, res, next) => {
       // Skip Next.js for API routes - let NestJS handle them
       if (req.path.startsWith('/api')) {
+        console.log(`⚡ Passing ${req.path} to NestJS Router`)
         return next()
       }
 
