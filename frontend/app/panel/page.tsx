@@ -1,88 +1,59 @@
 "use client"
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import Card from '../../components/Card'
-import { DollarSign, Wallet, TrendingUp, AlertTriangle, FileText, Car, Wrench, BookOpen, Tag, Shield, MapPin, Compass, Flame, CheckSquare, Globe, XCircle, Calendar } from 'lucide-react'
+import { DollarSign, Wallet, TrendingUp, AlertTriangle, FileText, Car, Wrench, BookOpen, Tag, Shield, MapPin, Compass, Flame, CheckSquare, Globe, XCircle, Calendar, Fuel, Droplet, Activity, Clock } from 'lucide-react'
 import { useDashboard } from '../../lib/hooks'
 
 export default function DashboardPage() {
     const { data, isLoading, error } = useDashboard()
 
-    if (isLoading) return <div className="p-8 text-center">Chargement...</div>
-    if (error) return <div className="p-8 text-center text-red-500">Erreur: {error instanceof Error ? error.message : 'Une erreur est survenue'}</div>
+    if (isLoading) return <div className="p-8 text-center animate-pulse">Chargement des données...</div>
+    // Safely handle error rendering
+    if (error) return (
+        <div className="p-8 text-center text-red-500">
+            <p className="font-bold">Une erreur est survenue lors du chargement.</p>
+            <p className="text-sm">{(error as any)?.message || 'Erreur inconnue'}</p>
+        </div>
+    )
     if (!data) return <div className="p-8 text-center">Aucune donnée disponible</div>
 
-    // Alert items for administrative documents
+    // Data Extraction with Safe Defaults
+    const fleet = data?.fleet ?? { total: 0, active: 0, maintenance: 0, available: 0 }
+    const fuel = data?.fuel?._sum ?? { amountTTC: 0, quantity: 0, distance: 0 }
+
+    // Alert items 
     const alertItems = [
-        { label: 'Cartes grises', count: 0, icon: FileText },
-        { label: 'Visites techniques', count: 0, icon: Wrench },
-        { label: 'Carnets métrologiques', count: 0, icon: BookOpen },
-        { label: 'Vignettes', count: 0, icon: Tag },
-        { label: 'Assurances', count: 0, icon: Shield },
-        { label: 'Taxes', count: 0, icon: DollarSign },
-        { label: 'Autorisations de circulation', count: 0, icon: MapPin },
-        { label: 'Permis de circulation', count: 0, icon: Compass },
-        { label: 'Extincteurs', count: 0, icon: Flame },
-        { label: 'Agréments', count: 0, icon: CheckSquare },
-        { label: 'Assurances Internationales', count: 0, icon: Globe },
-        { label: 'Réforme', count: 0, icon: XCircle },
-        { label: 'Fin mise en circulation', count: 0, icon: Calendar },
+        // Administratif
+        { label: 'Cartes grises (Exp)', count: 0, icon: FileText, type: 'admin' },
+        { label: 'Visites techniques', count: 0, icon: Wrench, type: 'admin' },
+        { label: 'Assurances', count: 0, icon: Shield, type: 'admin' },
+        { label: 'Vignettes', count: 0, icon: Tag, type: 'admin' },
+        // Operations
+        { label: 'Maintenance Retard', count: 0, icon: AlertTriangle, type: 'ops' },
+        { label: 'Trajets en Cours', count: 0, icon: Activity, type: 'ops' },
+        // Consommation
+        { label: 'Surconsommation', count: 0, icon: Fuel, type: 'fuel' },
+        { label: 'Anomalies Cartes', count: 0, icon: CreditCardIcon, type: 'fuel' },
     ]
 
-    // Alert color categories
+    // Helper for generic generic icons
+    function CreditCardIcon(props: any) { return <Wallet {...props} /> }
+
     const getAlertColor = (index: number) => {
+        // ... existing color logic ...
         const colors = [
-            {
-                bg: 'bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-blue-800/20',
-                border: 'border-blue-300 dark:border-blue-600',
-                icon: 'text-blue-600 dark:text-blue-400',
-                count: 'text-blue-700 dark:text-blue-300',
-                hover: 'hover:shadow-blue-200 dark:hover:shadow-blue-900/50 hover:border-blue-400 dark:hover:border-blue-500'
-            },
-            {
-                bg: 'bg-gradient-to-br from-purple-100 to-purple-50 dark:from-purple-900/30 dark:to-purple-800/20',
-                border: 'border-purple-300 dark:border-purple-600',
-                icon: 'text-purple-600 dark:text-purple-400',
-                count: 'text-purple-700 dark:text-purple-300',
-                hover: 'hover:shadow-purple-200 dark:hover:shadow-purple-900/50 hover:border-purple-400 dark:hover:border-purple-500'
-            },
-            {
-                bg: 'bg-gradient-to-br from-green-100 to-green-50 dark:from-green-900/30 dark:to-green-800/20',
-                border: 'border-green-300 dark:border-green-600',
-                icon: 'text-green-600 dark:text-green-400',
-                count: 'text-green-700 dark:text-green-300',
-                hover: 'hover:shadow-green-200 dark:hover:shadow-green-900/50 hover:border-green-400 dark:hover:border-green-500'
-            },
-            {
-                bg: 'bg-gradient-to-br from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-800/20',
-                border: 'border-orange-300 dark:border-orange-600',
-                icon: 'text-orange-600 dark:text-orange-400',
-                count: 'text-orange-700 dark:text-orange-300',
-                hover: 'hover:shadow-orange-200 dark:hover:shadow-orange-900/50 hover:border-orange-400 dark:hover:border-orange-500'
-            },
-            {
-                bg: 'bg-gradient-to-br from-red-100 to-red-50 dark:from-red-900/30 dark:to-red-800/20',
-                border: 'border-red-300 dark:border-red-600',
-                icon: 'text-red-600 dark:text-red-400',
-                count: 'text-red-700 dark:text-red-300',
-                hover: 'hover:shadow-red-200 dark:hover:shadow-red-900/50 hover:border-red-400 dark:hover:border-red-500'
-            },
-            {
-                bg: 'bg-gradient-to-br from-teal-100 to-teal-50 dark:from-teal-900/30 dark:to-teal-800/20',
-                border: 'border-teal-300 dark:border-teal-600',
-                icon: 'text-teal-600 dark:text-teal-400',
-                count: 'text-teal-700 dark:text-teal-300',
-                hover: 'hover:shadow-teal-200 dark:hover:shadow-teal-900/50 hover:border-teal-400 dark:hover:border-teal-500'
-            },
+            { bg: 'bg-blue-50 dark:bg-blue-900/20', border: 'border-blue-200 dark:border-blue-800', text: 'text-blue-700 dark:text-blue-300' },
+            { bg: 'bg-purple-50 dark:bg-purple-900/20', border: 'border-purple-200 dark:border-purple-800', text: 'text-purple-700 dark:text-purple-300' },
+            { bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-200 dark:border-orange-800', text: 'text-orange-700 dark:text-orange-300' },
         ]
         return colors[index % colors.length]
     }
 
-    // Safe data access
+    // Safe chart data
     const monthlyRevenue = data?.monthlyRevenue ?? []
     const monthlyCharges = data?.monthlyCharges ?? []
     const driverStats = data?.driverActivity?.driverStats ?? []
 
-    // Ensure monthlyCharges doesn't crash map if needed, but here we construct chart data safely
     const profitData = monthlyCharges.map((c: any, i: number) => {
         const revenue = monthlyRevenue[i]?.total || 0
         return {
@@ -92,170 +63,145 @@ export default function DashboardPage() {
     })
 
     return (
-        <div className="max-w-7xl mx-auto space-y-3 pb-0">
-            {/* Top KPI Cards - More compact */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                <Card title="Total Revenue" amount={data?.totalRevenue ?? 0} icon="💰" />
-                <Card title="Total Charges" amount={data?.totalCharges ?? 0} icon="💳" />
-                <Card title="Total Profit" amount={data?.totalProfit ?? 0} icon="📈" />
+        <div className="max-w-7xl mx-auto space-y-4 pb-0">
+
+            {/* 1. Fleet Statistics Row */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <StatCard label="Total Flotte" count={fleet.total} icon={Car} color="bg-blue-500" />
+                <StatCard label="Véhicules Actifs" count={fleet.active} icon={Activity} color="bg-green-500" />
+                <StatCard label="En Maintenance" count={fleet.maintenance} icon={Wrench} color="bg-orange-500" />
+                <StatCard label="Disponibles" count={fleet.available} icon={CheckSquare} color="bg-purple-500" />
             </div>
 
-            {/* Main Content Grid - Side by side layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                {/* Left Column - Alertes Administratifs */}
-                <div className="bg-gradient-to-br from-white to-orange-50 dark:from-gray-800 dark:to-gray-900 rounded-lg shadow-md border border-orange-200 dark:border-orange-900/50 p-3">
-                    <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                            <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-1.5 rounded-lg shadow-md">
-                                <AlertTriangle className="w-4 h-4 text-white" />
-                            </div>
-                            <div>
-                                <h2 className="text-base font-black text-gray-800 dark:text-white">Alertes Administratifs</h2>
-                                <p className="text-[10px] text-gray-600 dark:text-gray-400 font-medium">Documents et échéances</p>
-                            </div>
+            {/* 2. Financial & Fuel Statistics */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <Card title="Chiffre d'Affaires" amount={data?.totalRevenue ?? 0} icon="💰" />
+                <Card title="Dépenses Totales" amount={data?.totalCharges ?? 0} icon="💳" />
+                {/* Fuel Specific Card */}
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col justify-between">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+                            <Fuel className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                         </div>
-                        <div className="bg-orange-100 dark:bg-orange-900/30 px-2.5 py-1 rounded-full border border-orange-300 dark:border-orange-700">
-                            <span className="text-lg font-black text-orange-600 dark:text-orange-400">0</span>
+                        <h3 className="font-bold text-gray-700 dark:text-gray-200">Carburant</h3>
+                    </div>
+                    <div className="space-y-1">
+                        <div className="flex justify-between items-end">
+                            <span className="text-sm text-gray-500">Coût</span>
+                            <span className="text-xl font-black text-gray-800 dark:text-white">{(fuel.amountTTC ?? 0).toLocaleString()} MAD</span>
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <span className="text-sm text-gray-500">Volume</span>
+                            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{(fuel.quantity ?? 0).toLocaleString()} L</span>
                         </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 max-h-[calc(100vh-260px)] overflow-y-auto pr-1">
-                        {alertItems.map((item, index) => {
+                </div>
+            </div>
+
+            {/* 3. Main Content: Alerts & Driver Activity */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                {/* Left: Combined Alerts (Admin + Ops + Consumption) */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 lg:col-span-1">
+                    <div className="flex items-center gap-2 mb-4">
+                        <AlertTriangle className="w-5 h-5 text-red-500" />
+                        <h3 className="font-bold text-gray-800 dark:text-white">Centre d'Alertes</h3>
+                    </div>
+                    <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
+                        {alertItems.map((item, idx) => {
+                            const style = getAlertColor(idx)
                             const Icon = item.icon
-                            const colors = getAlertColor(index)
                             return (
-                                <div
-                                    key={index}
-                                    className={`${colors.bg} rounded-md p-2 border ${colors.border} ${colors.hover} transition-all duration-200 hover:shadow-md cursor-pointer`}
-                                >
-                                    <div className="flex items-start gap-1.5">
-                                        <div className="bg-white/80 dark:bg-gray-800/80 p-1 rounded shadow-sm flex-shrink-0">
-                                            <Icon className={`w-3.5 h-3.5 ${colors.icon}`} />
+                                <div key={idx} className={`flex items-center justify-between p-2 rounded-lg border ${style.bg} ${style.border}`}>
+                                    <div className="flex items-center gap-3">
+                                        <div className="bg-white dark:bg-gray-700 p-1.5 rounded-md shadow-sm">
+                                            <Icon className={`w-4 h-4 ${style.text}`} />
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-[9px] font-bold text-gray-700 dark:text-gray-300 line-clamp-2 leading-tight">{item.label}</p>
-                                            <p className={`text-base font-black ${colors.count} mt-0.5`}>{item.count}</p>
+                                        <div>
+                                            <p className="text-xs font-bold text-gray-700 dark:text-gray-200">{item.label}</p>
+                                            <p className="text-[10px] text-gray-500 uppercase tracking-wider">{item.type}</p>
                                         </div>
                                     </div>
+                                    <span className={`text-sm font-black ${style.text}`}>{item.count}</span>
                                 </div>
                             )
                         })}
                     </div>
                 </div>
 
-                {/* Right Column - Charts and Driver Activity */}
-                <div className="space-y-3">
-                    {/* Driver Activity Analytics */}
-                    <div className="bg-gradient-to-br from-white to-purple-50 dark:from-gray-800 dark:to-purple-900/20 p-3 rounded-lg shadow-md border border-purple-200 dark:border-purple-900/50">
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-1 rounded-md">
-                                <Car className="w-4 h-4 text-white" />
-                            </div>
-                            <h3 className="text-sm font-black text-gray-800 dark:text-white">Driver Activity</h3>
+                {/* Center/Right: Charts & Drivers - Taking 2 cols */}
+                <div className="lg:col-span-2 space-y-3">
+                    {/* Driver Stats */}
+                    <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                                <Car className="w-5 h-5 text-purple-500" />
+                                Performance Chauffeurs
+                            </h3>
+                            <span className="text-xs font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Top 5</span>
                         </div>
-                        <div className="space-y-2">
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-600 dark:text-gray-400">Total Drivers</span>
-                                <span className="text-lg font-bold text-purple-600 dark:text-purple-400">{data?.driverActivity?.totalDrivers ?? 0}</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-600 dark:text-gray-400">Active Drivers</span>
-                                <span className="text-lg font-bold text-green-600 dark:text-green-400">{data?.driverActivity?.activeDrivers ?? 0}</span>
-                            </div>
-                            <div className="mt-3">
-                                <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Top Drivers by Trips</h4>
-                                <div className="space-y-1 max-h-32 overflow-y-auto">
-                                    {driverStats.slice(0, 5).map((driver: any, index: number) => (
-                                        <div key={index} className="flex justify-between items-center text-xs">
-                                            <span className="truncate mr-2">{driver?.driverName || 'Unknown'}</span>
-                                            <span className="font-semibold text-purple-600 dark:text-purple-400">{driver?.tripCount ?? 0} trips</span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {/* List */}
+                            <div className="space-y-2">
+                                {driverStats.slice(0, 5).map((d: any, i: number) => (
+                                    <div key={i} className="flex items-center justify-between text-sm p-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded transition-colors">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center text-xs font-bold text-purple-700 dark:text-purple-300">
+                                                {i + 1}
+                                            </div>
+                                            <span className="font-medium">{d.driverName}</span>
                                         </div>
-                                    ))}
-                                    {driverStats.length === 0 && <div className="text-xs text-gray-500">No driver data available</div>}
-                                </div>
+                                        <span className="font-bold text-gray-700 dark:text-gray-300">{d.tripCount} trajets</span>
+                                    </div>
+                                ))}
+                                {driverStats.length === 0 && <p className="text-sm text-gray-400 italic">Aucune donnée chauffeur.</p>}
+                            </div>
+                            {/* Chart (Simplified) */}
+                            <div className="h-40 hidden sm:block">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={monthlyRevenue}>
+                                        <Line type="monotone" dataKey="total" stroke="#8b5cf6" strokeWidth={2} dot={false} />
+                                        <Tooltip />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                                <p className="text-center text-xs text-gray-400 mt-1">Évolution Revenus</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Revenue per Month Chart - Compact */}
-                    <div className="bg-gradient-to-br from-white to-teal-50 dark:from-gray-800 dark:to-teal-900/20 p-3 rounded-lg shadow-md border border-teal-200 dark:border-teal-900/50">
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="bg-gradient-to-br from-teal-500 to-teal-600 p-1 rounded-md">
-                                <TrendingUp className="w-4 h-4 text-white" />
-                            </div>
-                            <h3 className="text-sm font-black text-gray-800 dark:text-white">Revenue per Month</h3>
-                        </div>
-                        <div className="h-40">
-                            <ResponsiveContainer>
+                    {/* Revenue Chart */}
+                    <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <h3 className="font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
+                            <TrendingUp className="w-5 h-5 text-teal-500" />
+                            Évolution Financière
+                        </h3>
+                        <div className="h-48">
+                            <ResponsiveContainer width="100%" height="100%">
                                 <LineChart data={monthlyRevenue}>
-                                    <Line type="monotone" dataKey="total" stroke="#0ea5a4" strokeWidth={2} dot={{ r: 3, fill: '#0ea5a4' }} />
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" className="dark:opacity-20" />
-                                    <XAxis
-                                        dataKey="month"
-                                        stroke="#666"
-                                        style={{ fontSize: '9px', fontWeight: '600' }}
-                                        className="dark:text-gray-400"
-                                    />
-                                    <YAxis
-                                        stroke="#666"
-                                        style={{ fontSize: '9px', fontWeight: '600' }}
-                                        className="dark:text-gray-400"
-                                    />
-                                    <Tooltip
-                                        contentStyle={{
-                                            backgroundColor: '#fff',
-                                            border: '2px solid #0ea5a4',
-                                            borderRadius: '6px',
-                                            fontSize: '11px',
-                                            fontWeight: '600'
-                                        }}
-                                    />
-                                </LineChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </div>
-
-                    {/* Profit per Month Chart - Compact */}
-                    <div className="bg-gradient-to-br from-white to-orange-50 dark:from-gray-800 dark:to-orange-900/20 p-3 rounded-lg shadow-md border border-orange-200 dark:border-orange-900/50">
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-1 rounded-md">
-                                <DollarSign className="w-4 h-4 text-white" />
-                            </div>
-                            <h3 className="text-sm font-black text-gray-800 dark:text-white">Profit per Month</h3>
-                        </div>
-                        <div className="h-40">
-                            <ResponsiveContainer>
-                                <LineChart data={profitData}>
-                                    <Line type="monotone" dataKey="total" stroke="#f97316" strokeWidth={2} dot={{ r: 3, fill: '#f97316' }} />
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" className="dark:opacity-20" />
-                                    <XAxis
-                                        dataKey="month"
-                                        stroke="#666"
-                                        style={{ fontSize: '9px', fontWeight: '600' }}
-                                        className="dark:text-gray-400"
-                                    />
-                                    <YAxis
-                                        stroke="#666"
-                                        className="dark:text-gray-400"
-                                    />
-                                    <YAxis
-                                        stroke="#666"
-                                        style={{ fontSize: '9px', fontWeight: '600' }}
-                                        className="dark:text-gray-400"
-                                    />
-                                    <Tooltip
-                                        contentStyle={{
-                                            backgroundColor: '#fff',
-                                            border: '2px solid #f97316',
-                                            borderRadius: '6px',
-                                            fontSize: '11px',
-                                            fontWeight: '600'
-                                        }}
-                                    />
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
+                                    <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10 }} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10 }} />
+                                    <Tooltip />
+                                    <Line type="monotone" dataKey="total" stroke="#0d9488" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
                                 </LineChart>
                             </ResponsiveContainer>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    )
+}
+
+// Simple Stat Card Component
+function StatCard({ label, count, icon: Icon, color }: any) {
+    return (
+        <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-3 transition-transform hover:-translate-y-1 duration-300">
+            <div className={`p-2.5 rounded-lg ${color} bg-opacity-10`}>
+                <Icon className={`w-5 h-5 ${color.replace('bg-', 'text-')}`} />
+            </div>
+            <div>
+                <p className="text-xs text-gray-500 font-medium">{label}</p>
+                <p className="text-lg font-black text-gray-800 dark:text-white">{count}</p>
             </div>
         </div>
     )

@@ -168,7 +168,18 @@ export class FinanceService {
           completedTrips: parseInt(d.completedtrips),
           avgTripDuration: d.avgtripduration ? parseFloat(d.avgtripduration) : null
         }))
-      }
+      },
+      // New Analytics
+      fleet: {
+        total: await this.prisma.vehicle.count({ where: { companyId } }),
+        active: await this.prisma.vehicle.count({ where: { companyId, status: 'ACTIVE' } }),
+        maintenance: await this.prisma.vehicle.count({ where: { companyId, status: 'MAINTENANCE' } }),
+        available: await this.prisma.vehicle.count({ where: { companyId, status: 'AVAILABLE' } }),
+      },
+      fuel: await this.prisma.carburant.aggregate({
+        _sum: { amountTTC: true, quantity: true, distance: true },
+        where: { companyId, date: { gte: start, lte: end } }
+      })
     }
   }
 }
