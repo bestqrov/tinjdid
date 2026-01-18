@@ -80,7 +80,7 @@ export default function Sidebar() {
     {
       title: null,
       items: [
-        { href: '/overview', label: 'TABLEAU DE BORD', icon: '🏠', show: show.dashboard },
+        { href: '/panel', label: 'TABLEAU DE BORD', icon: '🏠', show: show.dashboard },
         { href: '/dashboard-staff', label: 'TABLEAU DE BORD SECRÉTAIRE', icon: '💼', show: show.dashboardStaff },
       ],
     },

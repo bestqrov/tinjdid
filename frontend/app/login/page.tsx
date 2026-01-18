@@ -73,7 +73,7 @@ export default function LoginPage() {
       if (userRole === 'SUPERADMIN') {
         window.location.href = '/super-admin'
       } else {
-        window.location.href = '/overview'
+        window.location.href = '/panel'
       }
     } catch (err: any) {
       setError(formatError(err))

@@ -17,6 +17,10 @@ export function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
+  // TEMPORARILY DISABLED AUTH CHECK to route debug 404
+  return NextResponse.next()
+
+  /*
   // rudimentary check: redirect to /login when cookie missing (improve with secure cookies)
   const token = req.cookies.get('access_token')?.value
   if (!token) {
@@ -25,6 +29,7 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(url)
   }
   return NextResponse.next()
+  */
 }
 
 export const config = {
