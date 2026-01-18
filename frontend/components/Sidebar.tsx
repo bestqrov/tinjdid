@@ -80,7 +80,7 @@ export default function Sidebar() {
     {
       title: null,
       items: [
-        { href: '/dashboard', label: 'TABLEAU DE BORD', icon: '🏠', show: show.dashboard },
+        { href: '/overview', label: 'TABLEAU DE BORD', icon: '🏠', show: show.dashboard },
         { href: '/dashboard-staff', label: 'TABLEAU DE BORD SECRÉTAIRE', icon: '💼', show: show.dashboardStaff },
       ],
     },
@@ -125,7 +125,7 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile overlay */}
-      <div 
+      <div
         className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden transition-opacity"
         onClick={() => {
           const sidebar = document.querySelector('aside');
@@ -133,12 +133,12 @@ export default function Sidebar() {
         }}
         style={{ display: 'none' }}
       />
-      
+
       <aside className="-translate-x-full md:translate-x-0 w-64 bg-blue-900 dark:bg-gray-800 border-r border-blue-800 dark:border-gray-700 fixed md:static inset-y-0 left-0 transform transition-transform duration-300 z-30 h-screen flex flex-col overflow-hidden">
         <div className="p-4 text-base sm:text-lg font-bold text-white flex items-center justify-between flex-shrink-0">
           <span>ArwaPark</span>
           {/* Close button for mobile */}
-          <button 
+          <button
             className="md:hidden text-white hover:bg-blue-800 dark:hover:bg-gray-700 p-1 rounded"
             onClick={() => {
               const sidebar = document.querySelector('aside');
@@ -148,43 +148,18 @@ export default function Sidebar() {
             ✕
           </button>
         </div>
-      <nav className="p-4 flex-1 overflow-y-auto">
-        {openGroup === null ? (
-          // compact headers view (Administratif placed second)
-          <div className="space-y-2">
-            {(() => {
-              const visible = menuGroups.filter(g => g.items.some(i => i.show))
-              if (visible.length === 0) return null
-              return (
-                <>
-                  {/* Dashboard as direct link */}
-                  {visible.slice(0, 1).map((g, idx) => {
-                    const item = g.items.find(i => i.show)
-                    if (!item) return null
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className="flex items-center gap-3 py-2 px-3 rounded hover:bg-blue-700 dark:hover:bg-gray-700 text-base text-white font-bold transition-colors"
-                      >
-                        <span className="w-4 inline-block text-lg">{item.icon}</span>
-                        <span>{item.label}</span>
-                      </Link>
-                    )
-                  })}
-
-                  {/* Consommation placed after Administratif */}
-                  <button onClick={() => setOpenGroup('consommation')} className="w-full flex items-center gap-3 py-2 px-3 rounded hover:bg-blue-700 dark:hover:bg-gray-700 text-base text-white font-bold transition-colors">
-                    <span className="w-4 inline-block text-lg">⛽</span>
-                    <span className="flex-1 text-left">CONSOMMATION</span>
-                    <span>▸</span>
-                  </button>
-
-                  {/* remaining groups */}
-                  {visible.slice(1).map((g, i) => {
-                    // If it's PARAMÈTRES (last group), render as direct link
-                    if (g.title === 'PARAMÈTRES') {
-                      const item = g.items.find(it => it.show)
+        <nav className="p-4 flex-1 overflow-y-auto">
+          {openGroup === null ? (
+            // compact headers view (Administratif placed second)
+            <div className="space-y-2">
+              {(() => {
+                const visible = menuGroups.filter(g => g.items.some(i => i.show))
+                if (visible.length === 0) return null
+                return (
+                  <>
+                    {/* Dashboard as direct link */}
+                    {visible.slice(0, 1).map((g, idx) => {
+                      const item = g.items.find(i => i.show)
                       if (!item) return null
                       return (
                         <Link
@@ -193,78 +168,103 @@ export default function Sidebar() {
                           className="flex items-center gap-3 py-2 px-3 rounded hover:bg-blue-700 dark:hover:bg-gray-700 text-base text-white font-bold transition-colors"
                         >
                           <span className="w-4 inline-block text-lg">{item.icon}</span>
-                          <span>{g.title}</span>
+                          <span>{item.label}</span>
                         </Link>
                       )
-                    }
-                    // Otherwise render as expandable button
-                    return (
-                      <button
-                        key={`g${i + 1}`}
-                        onClick={() => setOpenGroup(`g${i + 1}`)}
-                        className="w-full flex items-center gap-3 py-2 px-3 rounded hover:bg-blue-700 dark:hover:bg-gray-700 text-base text-white font-bold transition-colors"
-                      >
-                        <span className="w-4 inline-block text-lg">{g.items.find(it => it.show)?.icon}</span>
-                        <span className="flex-1 text-left">{g.title ?? g.items.find(it => it.show)?.label}</span>
-                        <span>▸</span>
-                      </button>
-                    )
-                  })}
-                </>
-              )
-            })()}
-          </div>
-        ) : (
-          // expanded group view
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <button onClick={() => setOpenGroup(null)} className="text-sm text-slate-200 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors">← Retour</button>
-              <button onClick={() => setOpenGroup(null)} className="text-sm text-slate-200 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors">Fermer</button>
-            </div>
+                    })}
 
-            {openGroup === 'consommation' ? (
-              <ConsommationLinks />
-            ) : (
-              (() => {
-                const visible = menuGroups.filter(g => g.items.some(i => i.show))
-                if (!openGroup || !openGroup.startsWith('g')) return null
-                const idx = Number(openGroup.slice(1))
-                const g = visible[idx]
-                if (!g) return null
-                return (
-                  <div>
-                    {g.title ? <div className="px-3 text-xs text-sky-200 font-medium mb-1">{g.title}</div> : null}
-                    <div className="space-y-1">
-                      {g.items.filter(i => i.show).map(i => (
-                        <Link key={i.href} className={itemClass} href={i.href}>
-                          <span className="w-4 inline-block">{i.icon}</span>
-                          {i.label}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
+                    {/* Consommation placed after Administratif */}
+                    <button onClick={() => setOpenGroup('consommation')} className="w-full flex items-center gap-3 py-2 px-3 rounded hover:bg-blue-700 dark:hover:bg-gray-700 text-base text-white font-bold transition-colors">
+                      <span className="w-4 inline-block text-lg">⛽</span>
+                      <span className="flex-1 text-left">CONSOMMATION</span>
+                      <span>▸</span>
+                    </button>
+
+                    {/* remaining groups */}
+                    {visible.slice(1).map((g, i) => {
+                      // If it's PARAMÈTRES (last group), render as direct link
+                      if (g.title === 'PARAMÈTRES') {
+                        const item = g.items.find(it => it.show)
+                        if (!item) return null
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className="flex items-center gap-3 py-2 px-3 rounded hover:bg-blue-700 dark:hover:bg-gray-700 text-base text-white font-bold transition-colors"
+                          >
+                            <span className="w-4 inline-block text-lg">{item.icon}</span>
+                            <span>{g.title}</span>
+                          </Link>
+                        )
+                      }
+                      // Otherwise render as expandable button
+                      return (
+                        <button
+                          key={`g${i + 1}`}
+                          onClick={() => setOpenGroup(`g${i + 1}`)}
+                          className="w-full flex items-center gap-3 py-2 px-3 rounded hover:bg-blue-700 dark:hover:bg-gray-700 text-base text-white font-bold transition-colors"
+                        >
+                          <span className="w-4 inline-block text-lg">{g.items.find(it => it.show)?.icon}</span>
+                          <span className="flex-1 text-left">{g.title ?? g.items.find(it => it.show)?.label}</span>
+                          <span>▸</span>
+                        </button>
+                      )
+                    })}
+                  </>
                 )
-              })()
-            )}
-          </div>
-        )}
-      </nav>
-      
-      {/* Disconnect Button at Bottom */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 bg-blue-950 dark:bg-gray-900 border-t border-blue-800 dark:border-gray-700">
-        <button
-          onClick={() => {
-            localStorage.removeItem('token')
-            localStorage.removeItem('refreshToken')
-            window.location.href = '/login'
-          }}
-          className="w-full flex items-center justify-center gap-3 py-2.5 px-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold transition-all shadow-lg hover:shadow-xl"
-        >
-          <span className="text-lg">🚪</span>
-          <span>Déconnexion</span>
-        </button>
-      </div>
-    </aside>
+              })()}
+            </div>
+          ) : (
+            // expanded group view
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <button onClick={() => setOpenGroup(null)} className="text-sm text-slate-200 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors">← Retour</button>
+                <button onClick={() => setOpenGroup(null)} className="text-sm text-slate-200 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors">Fermer</button>
+              </div>
+
+              {openGroup === 'consommation' ? (
+                <ConsommationLinks />
+              ) : (
+                (() => {
+                  const visible = menuGroups.filter(g => g.items.some(i => i.show))
+                  if (!openGroup || !openGroup.startsWith('g')) return null
+                  const idx = Number(openGroup.slice(1))
+                  const g = visible[idx]
+                  if (!g) return null
+                  return (
+                    <div>
+                      {g.title ? <div className="px-3 text-xs text-sky-200 font-medium mb-1">{g.title}</div> : null}
+                      <div className="space-y-1">
+                        {g.items.filter(i => i.show).map(i => (
+                          <Link key={i.href} className={itemClass} href={i.href}>
+                            <span className="w-4 inline-block">{i.icon}</span>
+                            {i.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })()
+              )}
+            </div>
+          )}
+        </nav>
+
+        {/* Disconnect Button at Bottom */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-blue-950 dark:bg-gray-900 border-t border-blue-800 dark:border-gray-700">
+          <button
+            onClick={() => {
+              localStorage.removeItem('token')
+              localStorage.removeItem('refreshToken')
+              window.location.href = '/login'
+            }}
+            className="w-full flex items-center justify-center gap-3 py-2.5 px-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold transition-all shadow-lg hover:shadow-xl"
+          >
+            <span className="text-lg">🚪</span>
+            <span>Déconnexion</span>
+          </button>
+        </div>
+      </aside>
     </>
   )
 }

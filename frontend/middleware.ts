@@ -3,12 +3,13 @@ import { NextRequest, NextResponse } from 'next/server'
 // simple middleware to protect app routes (client must set access_token in cookie/localStorage)
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
+  console.log('Middleware Path:', pathname)
 
   // public paths - landing page, login, reset password, forgot password, demo requests
   if (
     pathname === '/' ||
-    pathname.startsWith('/_next') || 
-    pathname.startsWith('/api') || 
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
     pathname === '/login' ||
     pathname === '/forgot-password' ||
     pathname === '/reset-password'
