@@ -20,9 +20,23 @@ async function bootstrap() {
     console.log(`🌍 Environment: ${nodeEnv}`)
     console.log(`🔧 Next.js running in ${dev ? 'development' : 'production'} mode`)
 
+    // Determine frontend path robustly for Docker/Prod
+    const frontendDir = join(process.cwd(), 'frontend')
+    console.log(`📂 Frontend Path: ${frontendDir}`)
+
+    if (require('fs').existsSync(frontendDir)) {
+      console.log('✅ Frontend directory verified')
+    } else {
+      console.error('❌ Frontend directory MISSING at: ' + frontendDir)
+      console.log('Listing current directory:', process.cwd())
+      try {
+        console.log('Contents:', require('fs').readdirSync(process.cwd()))
+      } catch (e) { }
+    }
+
     const nextApp = next({
       dev,
-      dir: join(process.cwd(), 'frontend')
+      dir: frontendDir
     })
 
     // Defer handler creation until after prepare? 
@@ -85,7 +99,8 @@ async function bootstrap() {
     })
 
     // Serve Static Assets
-    const frontendDir = join(process.cwd(), 'frontend')
+    // frontendDir is already defined at start of bootstrap
+    // const frontendDir = join(process.cwd(), 'frontend')
     const nextStaticPath = join(frontendDir, '.next', 'static')
     const publicPath = join(frontendDir, 'public')
 
