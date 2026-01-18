@@ -56,9 +56,9 @@ export default function LoginPage() {
           localStorage.setItem('user', JSON.stringify({ id: payload.sub, email: payload.email, role: payload.role, companyId: payload.companyId }))
           if (payload.companyId) localStorage.setItem('companyId', payload.companyId)
         }
-      } catch (e) {}
-      try { document.cookie = `access_token=${token}; path=/` } catch (e) {}
-      
+      } catch (e) { }
+      try { document.cookie = `access_token=${token}; path=/` } catch (e) { }
+
       // Redirect based on role
       if (userRole === 'SUPERADMIN') {
         window.location.href = '/super-admin'
@@ -75,18 +75,20 @@ export default function LoginPage() {
     <div className="h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-3 sm:p-4 overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 dark:bg-blue-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-300 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-3xl opacity-30 animate-blob"></div>
+        <div className="absolute -bottom-32 left-0 w-96 h-96 bg-pink-300 dark:bg-pink-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-300 dark:bg-blue-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
       </div>
 
       {/* Login Card */}
-      <div className="relative w-full max-w-md">
-        <div className="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-700">
+      <div className="relative w-full max-w-md px-4">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-white/20 dark:border-gray-700/50 transform transition-all hover:scale-[1.01] duration-500">
           {/* Header with Gradient */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-700 dark:to-purple-700 p-4 sm:p-5 text-white">
-            <div className="flex items-center justify-center mb-2">
-              <div className="bg-white dark:bg-gray-800 px-6 py-3 rounded-lg shadow-lg">
-                <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500">ArwaPark</h1>
+          <div className="bg-gradient-to-r from-blue-600/90 to-purple-600/90 dark:from-blue-700/90 dark:to-purple-700/90 p-6 sm:p-8 text-white relative overflow-hidden">
+            <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px]"></div>
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-lg ring-4 ring-white/20 mb-3 transform hover:rotate-3 transition-transform duration-300">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 tracking-tight">ArwaPark</h1>
               </div>
             </div>
             <p className="text-center text-blue-100 dark:text-blue-200 text-xs sm:text-sm mt-2">Gestion de Transport</p>
