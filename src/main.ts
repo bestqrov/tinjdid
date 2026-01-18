@@ -36,9 +36,7 @@ async function bootstrap() {
       abortOnError: false,
     })
 
-    app.setGlobalPrefix('api', {
-      exclude: ['health'],
-    })
+    app.setGlobalPrefix('api')
     app.useGlobalPipes(new ValidationPipe({
       whitelist: true,
       transform: true,
@@ -108,6 +106,11 @@ async function bootstrap() {
     const { tenantMiddleware } = await import('./common/middleware/tenant.middleware')
     app.use(tenantMiddleware)
 
+    // Direct Health Check (Bypass NestJS Router for reliability)
+    app.use('/health', (req, res) => {
+      res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() })
+    })
+
     // Logging middleware for debugging
     app.use((req, res, next) => {
       console.log(`➡️  ${req.method} ${req.path}`)
@@ -116,8 +119,8 @@ async function bootstrap() {
 
     // Add Next.js handler for all non-API routes
     app.use((req, res, next) => {
-      // Skip Next.js for API routes and health check - let NestJS handle them
-      if (req.path.startsWith('/api') || req.path === '/health') {
+      // Skip Next.js for API routes - let NestJS handle them
+      if (req.path.startsWith('/api')) {
         console.log(`⚡ Passing ${req.path} to NestJS Router`)
         return next()
       }
