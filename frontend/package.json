@@ -1,6 +1,6 @@
 {
   "name": "arwapark-frontend",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -15,7 +15,7 @@
     "axios": "^1.4.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.275.0",
-    "next": "^16.1.1",
+    "next": "14.2.10",
     "postcss": "^8.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

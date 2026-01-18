@@ -14,11 +14,15 @@ async function bootstrap() {
     const next = require('next')
 
     // Explicitly check for production
-    const nodeEnv = process.env.NODE_ENV || 'development'
+    const nodeEnv = (process.env.NODE_ENV || 'development').toLowerCase()
     const dev = nodeEnv !== 'production'
 
+    // Safety: If we are in production, force dev: false regardless of any other weirdness
+    const finalDev = nodeEnv === 'production' ? false : dev;
+
     console.log(`🌍 Environment: ${nodeEnv}`)
-    console.log(`🔧 Next.js running in ${dev ? 'development' : 'production'} mode`)
+    console.log(`🔧 Next.js Mode: ${finalDev ? 'DEVELOPMENT' : 'PRODUCTION'}`)
+    console.log(`📦 Next.js Version: ${require('next/package.json').version}`)
 
     // Determine frontend path robustly for Docker/Prod
     const frontendDir = join(process.cwd(), 'frontend')
@@ -35,7 +39,7 @@ async function bootstrap() {
     }
 
     const nextApp = next({
-      dev,
+      dev: finalDev,
       dir: frontendDir
     })
 
