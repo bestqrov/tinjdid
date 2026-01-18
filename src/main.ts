@@ -12,7 +12,14 @@ async function bootstrap() {
   try {
     // Initialize Next.js - use require to avoid ESM/CommonJS issues
     const next = require('next')
-    const dev = process.env.NODE_ENV !== 'production'
+
+    // Explicitly check for production
+    const nodeEnv = process.env.NODE_ENV || 'development'
+    const dev = nodeEnv !== 'production'
+
+    console.log(`🌍 Environment: ${nodeEnv}`)
+    console.log(`🔧 Next.js running in ${dev ? 'development' : 'production'} mode`)
+
     const nextApp = next({
       dev,
       dir: join(process.cwd(), 'frontend')
