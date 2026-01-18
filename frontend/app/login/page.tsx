@@ -53,6 +53,9 @@ export default function LoginPage() {
       })
       const token = data.access
       localStorage.setItem('access_token', token)
+      // Set Cookie for Middleware
+      document.cookie = `access_token=${token}; path=/; max-age=86400; SameSite=Lax`
+
       // decode token and set user/company
       let userRole = null
       try {
