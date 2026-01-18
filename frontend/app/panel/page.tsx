@@ -4,15 +4,20 @@ import Card from '../../components/Card'
 import { DollarSign, Wallet, TrendingUp, AlertTriangle, FileText, Car, Wrench, BookOpen, Tag, Shield, MapPin, Compass, Flame, CheckSquare, Globe, XCircle, Calendar, Fuel, Droplet, Activity, Clock } from 'lucide-react'
 import { useDashboard } from '../../lib/hooks'
 
+export const dynamic = 'force-dynamic'
+
 export default function DashboardPage() {
     const { data, isLoading, error } = useDashboard()
 
     if (isLoading) return <div className="p-8 text-center animate-pulse">Chargement des données...</div>
     // Safely handle error rendering
     if (error) return (
-        <div className="p-8 text-center text-red-500">
-            <p className="font-bold">Une erreur est survenue lors du chargement.</p>
-            <p className="text-sm">{(error as any)?.message || 'Erreur inconnue'}</p>
+        <div className="p-8 text-center text-red-500 bg-red-50 rounded-lg m-4 border border-red-200">
+            <p className="font-bold text-lg mb-2">Une erreur est survenue</p>
+            <code className="block bg-red-100 p-2 rounded text-xs text-left overflow-auto max-h-40">
+                {JSON.stringify(error, null, 2)}
+            </code>
+            <p className="text-sm mt-2">{(error as any)?.message || 'Erreur inconnue'}</p>
         </div>
     )
     if (!data) return <div className="p-8 text-center">Aucune donnée disponible</div>
