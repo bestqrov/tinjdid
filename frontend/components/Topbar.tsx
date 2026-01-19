@@ -86,7 +86,7 @@ export default function Topbar() {
         {companyProfile?.logo && (
           <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-lg overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
             <Image
-              src={`http://localhost:3001${companyProfile.logo}`}
+              src={companyProfile.logo.startsWith('http') ? companyProfile.logo : `${window.location.origin}${companyProfile.logo}`}
               alt={companyProfile.name || 'Company Logo'}
               fill
               className="object-contain"
@@ -123,7 +123,7 @@ export default function Topbar() {
             {(user as any)?.photo ? (
               <div className="relative w-6 h-6 sm:w-8 sm:h-8 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600">
                 <Image
-                  src={`http://localhost:3001${(user as any).photo}`}
+                  src={(user as any).photo.startsWith('http') ? (user as any).photo : `${window.location.origin}${(user as any).photo}`}
                   alt={(user as any).name || 'User Photo'}
                   fill
                   className="object-cover"

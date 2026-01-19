@@ -43,8 +43,7 @@ async function bootstrap() {
       dir: frontendDir
     })
 
-    // Defer handler creation until after prepare? 
-    // Usually safe to get handler, but we will guard the execution.
+    // Defer handler creation until after prepare
     const handle = nextApp.getRequestHandler()
     let isNextReady = false
 
@@ -79,7 +78,7 @@ async function bootstrap() {
       allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     })
 
-    // Multer Config
+    // Multer Config for uploads
     const storage = multer.diskStorage({
       destination: (req, file, cb) => {
         cb(null, join(process.cwd(), 'uploads'))
@@ -103,22 +102,18 @@ async function bootstrap() {
     })
 
     // Serve Static Assets
-    // frontendDir is already defined at start of bootstrap
-    // const frontendDir = join(process.cwd(), 'frontend')
     const nextStaticPath = join(frontendDir, '.next', 'static')
     const publicPath = join(frontendDir, 'public')
 
     if (existsSync(nextStaticPath)) app.useStaticAssets(nextStaticPath, { prefix: '/_next/static' })
     if (existsSync(publicPath)) app.useStaticAssets(publicPath, { prefix: '/' })
 
-    // Valid Middlewares
+    // Middlewares
     const { tenantMiddleware } = await import('./common/middleware/tenant.middleware')
     app.use(tenantMiddleware)
 
-    // 1. Direct Health Check (CRITICAL: Must work immediately)
+    // 1. Direct Health Check
     app.use('/health', (req, res) => {
-      // If Next.js is still loading, we can still report "ok" but maybe warn?
-      // Load balancer just wants 200 OK.
       res.status(200).json({
         status: 'ok',
         nextReady: isNextReady,
@@ -126,7 +121,7 @@ async function bootstrap() {
       })
     })
 
-    // Debug Endpoint (Use raw Express instance)
+    // Debug Endpoint
     const expressApp = app.getHttpAdapter().getInstance()
     expressApp.post('/api/ping', (req, res) => {
       res.status(200).json({ message: 'pong', method: req.method })
@@ -145,20 +140,24 @@ async function bootstrap() {
 
     // 3. Next.js Handler (Guarded)
     app.use((req, res, next) => {
-      if (req.path.startsWith('/api')) {
-        console.log(`⚡ Passing ${req.path} to NestJS Router`)
+      const path = req.path
+
+      // All API calls go to NestJS
+      if (path.startsWith('/api')) {
+        console.log(`🎯 [NestJS API] ${req.method} ${path}`)
         return next()
       }
 
       // If Next.js isn't ready yet, show a friendly loading page
       if (!isNextReady) {
+        console.log(`⏳ [Next.js proxy] NOT READY - Waiting for: ${path}`)
         res.status(503).send(`
           <html>
             <head><meta http-equiv="refresh" content="2"></head>
             <body style="font-family:sans-serif; display:flex; justify-content:center; align-items:center; height:100vh;">
               <div style="text-align:center">
                 <h2>Application is starting...</h2>
-                <p>Please wait...</p>
+                <p>Initialisation de l'interface en cours, veuillez patienter.</p>
               </div>
             </body>
           </html>
@@ -166,12 +165,13 @@ async function bootstrap() {
         return
       }
 
+      // Pass everything else to Next.js
       return handle(req, res)
     })
 
     const port = process.env.PORT || 3000;
 
-    // START SERVER FIRST
+    // START SERVER
     await app.listen(port, '0.0.0.0');
 
     console.log(`✅ Backend server listening on port ${port}`)
@@ -182,7 +182,6 @@ async function bootstrap() {
       isNextReady = true
       console.log('✅ Next.js application ready!')
 
-      // Log connection details
       const baseUrl = process.env.NODE_ENV === 'production'
         ? 'https://arwapark.digima.cloud'
         : `http://localhost:${port}`;
@@ -195,13 +194,9 @@ async function bootstrap() {
 
   } catch (error) {
     console.error('❌ Failed to start the backend server:', error)
-    console.error('Error details:', error.message)
-    if (error.stack) console.error('Stack trace:', error.stack)
     process.exit(1)
   }
 }
-
-
 
 bootstrap().catch((error) => {
   console.error('❌ Bootstrap failed:', error)

@@ -41,7 +41,7 @@ export class FinanceController {
     return this.svc.convertQuoteToInvoice(id, { markAccepted: body?.markAccepted })
   }
 
-  @Get('/dashboard/stats')
+  @Get('dashboard/stats')
   @Roles('ADMIN', 'STAFF', 'DRIVER')
   async stats(@Req() req, @Query('companyId') companyId: string, @Query('start') start?: string, @Query('end') end?: string) {
     const finalCompanyId = companyId || req.user.companyId
