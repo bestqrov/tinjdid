@@ -6,7 +6,7 @@ export function useDashboard(companyId?: string, start?: string, end?: string) {
   return useQuery({
     queryKey: ['dashboard', companyId, start, end],
     queryFn: async () => {
-      const res = await axios.get('/finance/dashboard/stats', { params: { companyId, start, end } })
+      const res = await axios.get('finance/dashboard/stats', { params: { companyId, start, end } })
       return res.data
     }
   })
@@ -15,7 +15,7 @@ export function useDashboard(companyId?: string, start?: string, end?: string) {
 export function useDownloadInvoicePdf() {
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await axios.get(`/finance/invoices/${id}/pdf`, { responseType: 'blob' })
+      const res = await axios.get(`finance/invoices/${id}/pdf`, { responseType: 'blob' })
       return res.data
     }
   })
@@ -24,7 +24,7 @@ export function useDownloadInvoicePdf() {
 export function useDownloadQuotePdf() {
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await axios.get(`/finance/quotes/${id}/pdf`, { responseType: 'blob' })
+      const res = await axios.get(`finance/quotes/${id}/pdf`, { responseType: 'blob' })
       return res.data
     }
   })
@@ -32,10 +32,10 @@ export function useDownloadQuotePdf() {
 
 export function useTripProfit(id?: string) {
   return useQuery({
-    queryKey: ['trip','profit', id],
+    queryKey: ['trip', 'profit', id],
     queryFn: async () => {
       if (!id) return null
-      const res = await axios.get(`/trips/${id}/profit`)
+      const res = await axios.get(`trips/${id}/profit`)
       return res.data
     },
     enabled: !!id
@@ -46,7 +46,7 @@ export function useDrivers(companyId?: string) {
   return useQuery({
     queryKey: ['drivers', companyId],
     queryFn: async () => {
-      const res = await axios.get(`/drivers?companyId=${companyId}`)
+      const res = await axios.get(`drivers?companyId=${companyId}`)
       return res.data
     }
   })
@@ -57,7 +57,7 @@ export function useDriver(id?: string) {
     queryKey: ['driver', id],
     queryFn: async () => {
       if (!id) return null
-      const res = await axios.get(`/drivers/${id}`)
+      const res = await axios.get(`drivers/${id}`)
       return res.data
     },
     enabled: !!id

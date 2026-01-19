@@ -47,8 +47,8 @@ export default function Topbar() {
     try {
       // Only attempt to load if user is authenticated and not super admin
       if (!user || user.role === 'SUPER_ADMIN') return
-      
-      const response = await axios.get('/settings/company-profile')
+
+      const response = await axios.get('settings/company-profile')
       if (response.data?.data) {
         setCompanyProfile(response.data.data)
       }
@@ -70,7 +70,7 @@ export default function Topbar() {
   return (
     <header className="flex items-center justify-between border-b bg-white dark:bg-gray-800 dark:border-gray-700 p-3 md:p-4 transition-colors">
       {/* Mobile menu button */}
-      <button 
+      <button
         className="md:hidden flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         onClick={() => {
           const sidebar = document.querySelector('aside');
@@ -117,7 +117,7 @@ export default function Topbar() {
             <Sun size={18} className="text-gray-300" />
           )}
         </button>
-          <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-3">
           {/* User Photo and Name */}
           <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
             {(user as any)?.photo ? (
