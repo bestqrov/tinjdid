@@ -21,67 +21,12 @@ export default function Sidebar() {
     settings: role === 'ADMIN' || role === 'DRIVER',
   }
 
-  // Super Admin Menu
-  if (isSuperAdmin) {
-    return (
-      <>
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden transition-opacity" style={{ display: 'none' }} />
-        <aside className="-translate-x-full md:translate-x-0 w-64 bg-gradient-to-b from-purple-900 to-purple-800 border-r border-purple-700 fixed md:static inset-y-0 left-0 transform transition-transform duration-300 z-30 h-screen flex flex-col overflow-hidden">
-          <div className="p-4 text-lg font-bold text-white flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              <span>👑</span>
-              <div>
-                <div className="text-sm font-bold">SUPER ADMIN</div>
-                <div className="text-xs text-purple-300">ArwaPark SaaS</div>
-              </div>
-            </span>
-          </div>
-          <nav className="p-4 space-y-2">
-            <Link href="/super-admin" className="flex items-center gap-3 py-2 px-3 rounded hover:bg-purple-700 text-sm text-white transition-colors">
-              <span>📊</span>
-              <span>Dashboard</span>
-            </Link>
-            <Link href="/super-admin/companies" className="flex items-center gap-3 py-2 px-3 rounded hover:bg-purple-700 text-sm text-white transition-colors">
-              <span>🏢</span>
-              <span>Entreprises</span>
-            </Link>
-            <Link href="/super-admin/plans" className="flex items-center gap-3 py-2 px-3 rounded hover:bg-purple-700 text-sm text-white transition-colors">
-              <span>💎</span>
-              <span>Plans & Abonnements</span>
-            </Link>
-            <Link href="/super-admin/revenue" className="flex items-center gap-3 py-2 px-3 rounded hover:bg-purple-700 text-sm text-white transition-colors">
-              <span>💰</span>
-              <span>Revenus</span>
-            </Link>
-            <Link href="/super-admin/users" className="flex items-center gap-3 py-2 px-3 rounded hover:bg-purple-700 text-sm text-white transition-colors">
-              <span>👥</span>
-              <span>Utilisateurs</span>
-            </Link>
-            <Link href="/super-admin/logs" className="flex items-center gap-3 py-2 px-3 rounded hover:bg-purple-700 text-sm text-white transition-colors">
-              <span>📋</span>
-              <span>Logs d'Activité</span>
-            </Link>
-            <Link href="/super-admin/system" className="flex items-center gap-3 py-2 px-3 rounded hover:bg-purple-700 text-sm text-white transition-colors">
-              <span>🔧</span>
-              <span>Santé Système</span>
-            </Link>
-            <Link href="/super-admin/settings" className="flex items-center gap-3 py-2 px-3 rounded hover:bg-purple-700 text-sm text-white transition-colors">
-              <span>⚙️</span>
-              <span>Paramètres</span>
-            </Link>
-          </nav>
-        </aside>
-      </>
-    )
-  }
-
-  const itemClass = 'flex items-center gap-3 py-2 px-3 rounded hover:bg-blue-700 text-sm text-white'
   const menuGroups = [
     {
-      title: null,
+      title: 'MENU PRINCIPAL',
       items: [
-        { href: '/panel', label: 'TABLEAU DE BORD', icon: '🏠', show: show.dashboard },
-        { href: '/dashboard-staff', label: 'TABLEAU DE BORD SECRÉTAIRE', icon: '💼', show: show.dashboardStaff },
+        { href: '/panel', label: 'Tableau de Bord', icon: '🏠', show: show.dashboard },
+        { href: '/dashboard-staff', label: 'Tableau Secrétaire', icon: '💼', show: show.dashboardStaff },
       ],
     },
     {
@@ -101,14 +46,9 @@ export default function Sidebar() {
       ],
     },
     {
-      title: 'FINANCE',
+      title: 'PREFERENCES',
       items: [
         { href: '/charges', label: 'Charges', icon: '💳', show: show.charges },
-      ],
-    },
-    {
-      title: 'PARAMÈTRES',
-      items: [
         {
           href: role === 'DRIVER' ? '/settings-driver' : '/settings',
           label: 'Paramètres',
@@ -121,190 +61,87 @@ export default function Sidebar() {
 
   const [openGroup, setOpenGroup] = useState<string | null>(null)
 
-  // when no group is open show compact headers only; when one is open show its items only
+  // Super Admin view is different but we can apply similar style logic if needed.
+  // For now let's focus on the standard sidebar.
+
   return (
     <>
-      {/* Mobile overlay */}
-      <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden transition-opacity"
-        onClick={() => {
-          const sidebar = document.querySelector('aside');
-          if (sidebar) sidebar.classList.add('-translate-x-full');
-        }}
-        style={{ display: 'none' }}
-      />
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden transition-opacity" style={{ display: 'none' }} />
 
-      <aside className="-translate-x-full md:translate-x-0 w-64 bg-blue-900 dark:bg-gray-800 border-r border-blue-800 dark:border-gray-700 fixed md:static inset-y-0 left-0 transform transition-transform duration-300 z-30 h-screen flex flex-col overflow-hidden">
-        <div className="p-4 text-base sm:text-lg font-bold text-white flex items-center justify-between flex-shrink-0">
-          <span>ArwaPark</span>
-          {/* Close button for mobile */}
-          <button
-            className="md:hidden text-white hover:bg-blue-800 dark:hover:bg-gray-700 p-1 rounded"
-            onClick={() => {
-              const sidebar = document.querySelector('aside');
-              if (sidebar) sidebar.classList.add('-translate-x-full');
-            }}
-          >
-            ✕
-          </button>
-        </div>
-        <nav className="p-4 flex-1 overflow-y-auto">
-          {openGroup === null ? (
-            // compact headers view (Administratif placed second)
-            <div className="space-y-2">
-              {(() => {
-                const visible = menuGroups.filter(g => g.items.some(i => i.show))
-                if (visible.length === 0) return null
-                return (
-                  <>
-                    {/* Dashboard as direct link */}
-                    {visible.slice(0, 1).map((g, idx) => {
-                      const item = g.items.find(i => i.show)
-                      if (!item) return null
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          className="flex items-center gap-3 py-2 px-3 rounded hover:bg-blue-700 dark:hover:bg-gray-700 text-base text-white font-bold transition-colors"
-                        >
-                          <span className="w-4 inline-block text-lg">{item.icon}</span>
-                          <span>{item.label}</span>
-                        </Link>
-                      )
-                    })}
+      <aside className="-translate-x-full md:translate-x-0 w-64 bg-[#1e293b] fixed md:static inset-y-0 left-0 transform transition-transform duration-300 z-30 h-screen flex flex-col overflow-hidden m-0">
 
-                    {/* Consommation placed after Administratif */}
-                    <button onClick={() => setOpenGroup('consommation')} className="w-full flex items-center gap-3 py-2 px-3 rounded hover:bg-blue-700 dark:hover:bg-gray-700 text-base text-white font-bold transition-colors">
-                      <span className="w-4 inline-block text-lg">⛽</span>
-                      <span className="flex-1 text-left">CONSOMMATION</span>
-                      <span>▸</span>
-                    </button>
+        {/* Sidebar Header: Brand & Profile */}
+        <div className="p-6 space-y-6 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-lg">M</div>
+            <span className="text-white font-black tracking-tight text-lg uppercase">ArwaPark</span>
+          </div>
 
-                    {/* remaining groups */}
-                    {visible.slice(1).map((g, i) => {
-                      // If it's PARAMÈTRES (last group), render as direct link
-                      if (g.title === 'PARAMÈTRES') {
-                        const item = g.items.find(it => it.show)
-                        if (!item) return null
-                        return (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            className="flex items-center gap-3 py-2 px-3 rounded hover:bg-blue-700 dark:hover:bg-gray-700 text-base text-white font-bold transition-colors"
-                          >
-                            <span className="w-4 inline-block text-lg">{item.icon}</span>
-                            <span>{g.title}</span>
-                          </Link>
-                        )
-                      }
-                      // Otherwise render as expandable button
-                      return (
-                        <button
-                          key={`g${i + 1}`}
-                          onClick={() => setOpenGroup(`g${i + 1}`)}
-                          className="w-full flex items-center gap-3 py-2 px-3 rounded hover:bg-blue-700 dark:hover:bg-gray-700 text-base text-white font-bold transition-colors"
-                        >
-                          <span className="w-4 inline-block text-lg">{g.items.find(it => it.show)?.icon}</span>
-                          <span className="flex-1 text-left">{g.title ?? g.items.find(it => it.show)?.label}</span>
-                          <span>▸</span>
-                        </button>
-                      )
-                    })}
-                  </>
-                )
-              })()}
-            </div>
-          ) : (
-            // expanded group view
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <button onClick={() => setOpenGroup(null)} className="text-sm text-slate-200 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors">← Retour</button>
-                <button onClick={() => setOpenGroup(null)} className="text-sm text-slate-200 dark:text-gray-400 hover:text-white dark:hover:text-white transition-colors">Fermer</button>
-              </div>
-
-              {openGroup === 'consommation' ? (
-                <ConsommationLinks />
+          {/* User Profile Info (Reference style) */}
+          <div className="bg-[#ffffff10] rounded-2xl p-4 flex flex-col items-center text-center space-y-2 border border-[#ffffff05]">
+            <div className="w-16 h-16 rounded-full border-2 border-orange-500 p-0.5 overflow-hidden">
+              {(user as any)?.photo ? (
+                <img src={(user as any).photo.startsWith('http') ? (user as any).photo : `${window.location.origin}${(user as any).photo}`} alt="Profile" className="w-full h-full object-cover rounded-full" />
               ) : (
-                (() => {
-                  const visible = menuGroups.filter(g => g.items.some(i => i.show))
-                  if (!openGroup || !openGroup.startsWith('g')) return null
-                  const idx = Number(openGroup.slice(1))
-                  const g = visible[idx]
-                  if (!g) return null
-                  return (
-                    <div>
-                      {g.title ? <div className="px-3 text-xs text-sky-200 font-medium mb-1">{g.title}</div> : null}
-                      <div className="space-y-1">
-                        {g.items.filter(i => i.show).map(i => (
-                          <Link key={i.href} className={itemClass} href={i.href}>
-                            <span className="w-4 inline-block">{i.icon}</span>
-                            {i.label}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )
-                })()
+                <div className="w-full h-full bg-slate-700 flex items-center justify-center text-xl text-white font-bold">
+                  {user?.name?.charAt(0) || 'U'}
+                </div>
               )}
             </div>
-          )}
+            <div>
+              <div className="text-white font-bold text-sm truncate max-w-[180px]">{user?.name || 'Utilisateur'}</div>
+              <div className="text-slate-400 text-xs font-medium">@{user?.email?.split('@')[0] || 'profile'}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 px-4 py-2 space-y-6 overflow-y-auto custom-scrollbar">
+          {menuGroups.map((group, gIdx) => (
+            <div key={gIdx} className="space-y-2">
+              <h3 className="px-3 text-[10px] font-black text-slate-500 uppercase tracking-[2px]">
+                {group.title}
+              </h3>
+              <div className="space-y-1">
+                {group.items.filter(i => i.show).map((item, iIdx) => (
+                  <Link
+                    key={iIdx}
+                    href={item.href}
+                    className="flex items-center gap-3 py-2.5 px-3 rounded-xl hover:bg-white/5 text-slate-400 hover:text-white transition-all duration-200 group"
+                  >
+                    <span className="text-lg opacity-70 group-hover:opacity-100 transition-opacity">{item.icon}</span>
+                    <span className="text-sm font-semibold">{item.label}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          {/* Special Consommation Button if needed - Simplified */}
+          <div className="space-y-2">
+            <h3 className="px-3 text-[10px] font-black text-slate-500 uppercase tracking-[2px]">DATA</h3>
+            <Link href="/consommation/carburant" className="flex items-center gap-3 py-2.5 px-3 rounded-xl hover:bg-white/5 text-slate-400 hover:text-white transition-all duration-200 group">
+              <span className="text-lg opacity-70 group-hover:opacity-100">⛽</span>
+              <span className="text-sm font-semibold">Consommation</span>
+            </Link>
+          </div>
         </nav>
 
-        {/* Disconnect Button at Bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-blue-950 dark:bg-gray-900 border-t border-blue-800 dark:border-gray-700">
+        {/* Sidebar Footer: Logout (Orange Button) */}
+        <div className="p-6 mt-auto">
           <button
             onClick={() => {
               localStorage.removeItem('token')
               localStorage.removeItem('refreshToken')
               window.location.href = '/login'
             }}
-            className="w-full flex items-center justify-center gap-3 py-2.5 px-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold transition-all shadow-lg hover:shadow-xl"
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-2xl bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-black transition-all shadow-lg shadow-orange-500/20"
           >
             <span className="text-lg">🚪</span>
-            <span>Déconnexion</span>
+            <span>Se Déconnecter</span>
           </button>
         </div>
       </aside>
     </>
-  )
-}
-
-function ConsommationLinks() {
-  const [open, setOpen] = useState(true)
-  const items = [
-    { href: '/consommation/carburant', label: 'Carburant' },
-    { href: '/consommation/cartes', label: 'Cartes' },
-    { href: '/consommation/recharges-cartes', label: 'Recharges des cartes' },
-    { href: '/consommation/services', label: 'Services' },
-    { href: '/consommation/autoroutes', label: 'Autoroutes' },
-    { href: '/consommation/depenses', label: 'Dépenses' },
-    { href: '/consommation/frais-generaux', label: 'Frais généraux' },
-  ]
-
-  const sorted = items.slice().sort((a, b) => a.label.localeCompare(b.label, 'fr', { sensitivity: 'base' }))
-
-  return (
-    <div className="mt-4 text-slate-200 dark:text-gray-300">
-      <button
-        onClick={() => setOpen(v => !v)}
-        className="w-full flex items-center justify-between px-3 py-2 rounded hover:bg-blue-800 dark:hover:bg-gray-700 text-base text-white transition-colors"
-      >
-        <div className="flex items-center gap-3">
-          <span className="w-4 inline-block text-lg">⛽</span>
-          <span className="font-bold">CONSOMMATION</span>
-        </div>
-        <span className={`transform transition-transform ${open ? 'rotate-180' : 'rotate-0'}`}>
-          ▾
-        </span>
-      </button>
-
-      {open && (
-        <div className="space-y-1 px-2 pt-2">
-          {sorted.map(i => (
-            <Link key={i.href} className="block ml-2 text-sm text-slate-200 dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors" href={i.href}>{i.label}</Link>
-          ))}
-        </div>
-      )}
-    </div>
   )
 }

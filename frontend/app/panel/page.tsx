@@ -1,7 +1,7 @@
 "use client"
+import React from 'react'
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import Card from '../../components/Card'
-import { DollarSign, Wallet, TrendingUp, AlertTriangle, FileText, Car, Wrench, BookOpen, Tag, Shield, MapPin, Compass, Flame, CheckSquare, Globe, XCircle, Calendar, Fuel, Droplet, Activity, Clock } from 'lucide-react'
+import { DollarSign, TrendingUp, Car, CheckSquare, Fuel, Activity } from 'lucide-react'
 import { useDashboard } from '../../lib/hooks'
 
 export const dynamic = 'force-dynamic'
@@ -9,16 +9,15 @@ export const dynamic = 'force-dynamic'
 export default function DashboardPage() {
     const { data, isLoading, error } = useDashboard()
 
-    if (isLoading) return <div className="p-8 text-center animate-pulse">Chargement des données...</div>
+    if (isLoading) return <div className="p-8 text-center animate-pulse py-20 text-slate-400 font-bold">Chargement de votre espace...</div>
     if (error) return (
-        <div className="p-8 text-center text-red-500 bg-red-50 rounded-lg m-4 border border-red-200">
-            <p className="font-bold text-lg mb-2">Une erreur est survenue</p>
-            <p className="text-sm mt-2">{(error as any)?.message || 'Erreur inconnue'}</p>
+        <div className="p-8 text-center text-red-500 bg-red-50 rounded-[2.5rem] m-4 border border-red-100">
+            <p className="font-black text-lg mb-2">Une erreur est survenue</p>
+            <p className="text-sm mt-2 font-medium">{(error as any)?.message || 'Erreur inconnue'}</p>
         </div>
     )
-    if (!data) return <div className="p-8 text-center">Aucune donnée disponible</div>
+    if (!data) return <div className="p-8 text-center py-20 text-slate-400">Aucune donnée disponible</div>
 
-    // Data Extraction
     const fleet = data?.fleet ?? { total: 0, active: 0, maintenance: 0, available: 0 }
     const fuel = data?.fuel?._sum ?? { amountTTC: 0, quantity: 0, distance: 0 }
     const recentTrips = data?.recentTrips ?? []
@@ -26,159 +25,180 @@ export default function DashboardPage() {
     const monthlyRevenue = data?.monthlyRevenue ?? []
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6 pb-8">
+        <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 pb-20 p-2 md:p-6 animation-fade-in">
 
-            {/* 1. High Impact KPI Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <KPICard label="Revenu Total" amount={data.totalRevenue} icon={<DollarSign />} color="indigo" />
-                <KPICard label="Bénéfice Net" amount={data.totalProfit} icon={<TrendingUp />} color="emerald" />
-                <KPICard label="Dépenses Carburant" amount={fuel.amountTTC || 0} icon={<Fuel />} color="amber" />
-                <KPICard label="Missions Effectuées" count={data.tripsByStatus?.find((s: any) => s.status === 'DONE')?._count?.status || 0} icon={<CheckSquare />} color="blue" />
-            </div>
+            {/* LEFT AREA: Stats & Main Activity (9 Columns) */}
+            <div className="lg:col-span-8 xl:col-span-9 space-y-8">
 
-            {/* 2. Middle Row: Fleet Status & Finances */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                {/* Top Row: KPIs in small Bento cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+                    <BentoKPI label="Revenu" amount={data.totalRevenue} sub="Chiffre d'affaires" color="bg-[#6366f1]" />
+                    <BentoKPI label="Dépenses" amount={data.totalCharges} sub="Total charges" color="bg-[#f97316]" />
+                    <BentoKPI label="Carburant" amount={fuel.amountTTC || 0} sub={`${(fuel.quantity || 0).toLocaleString()} L consommés`} color="bg-[#10b981]" />
+                </div>
 
-                {/* Fleet Overview (4 cols) */}
-                <div className="lg:col-span-4 space-y-4">
-                    <div className="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                        <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                            <Car className="w-5 h-5 text-blue-500" />
-                            État de la Flotte
-                        </h3>
-                        <div className="space-y-3">
-                            <StatusRow label="En service" count={fleet.active} total={fleet.total} color="bg-green-500" />
-                            <StatusRow label="En maintenance" count={fleet.maintenance} total={fleet.total} color="bg-orange-500" />
-                            <StatusRow label="Disponibles" count={fleet.available} total={fleet.total} color="bg-blue-400" />
-                            <div className="pt-2 border-t dark:border-gray-700 flex justify-between items-center">
-                                <span className="text-sm font-medium text-gray-500">Total Véhicules</span>
-                                <span className="text-xl font-black text-gray-800 dark:text-white">{fleet.total}</span>
+                {/* Middle Row: Operational charts & Lists */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Evolution Chart Card */}
+                    <div className="bg-white rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 border border-slate-100/50 flex flex-col h-[400px]">
+                        <div className="flex justify-between items-center mb-10">
+                            <div>
+                                <h3 className="text-xl font-black text-[#1e293b]">Évolution Financière</h3>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Revenus mensuels</p>
+                            </div>
+                            <div className="p-3 bg-indigo-50 rounded-2xl">
+                                <TrendingUp className="w-5 h-5 text-indigo-500" />
                             </div>
                         </div>
-                    </div>
-
-                    {/* Quick Stats Mini-Card */}
-                    <div className="bg-gradient-to-br from-indigo-600 to-violet-700 p-5 rounded-2xl shadow-lg text-white">
-                        <h4 className="text-indigo-100 text-xs font-bold uppercase tracking-widest mb-1">Rendement Flotte</h4>
-                        <div className="text-3xl font-black mb-2">{fleet.total > 0 ? Math.round((fleet.active / fleet.total) * 100) : 0}%</div>
-                        <div className="w-full bg-white/20 h-1.5 rounded-full overflow-hidden">
-                            <div className="bg-white h-full" style={{ width: `${fleet.total > 0 ? (fleet.active / fleet.total) * 100 : 0}%` }}></div>
-                        </div>
-                        <p className="mt-3 text-[10px] text-indigo-100 opacity-80 italic">Calculé sur les véhicules actifs vs total</p>
-                    </div>
-                </div>
-
-                {/* Operations Feed - REPLACING ALERTS (8 cols) */}
-                <div className="lg:col-span-8">
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 h-full flex flex-col">
-                        <div className="p-5 border-b dark:border-gray-700 flex justify-between items-center">
-                            <h3 className="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                                <Activity className="w-5 h-5 text-emerald-500" />
-                                Commandes Récentes
-                            </h3>
-                            <button className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">Voir tout</button>
-                        </div>
-                        <div className="flex-1 overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-gray-50 dark:bg-gray-900/50 text-[10px] uppercase tracking-wider text-gray-500 font-bold">
-                                        <th className="px-6 py-3">Client / Trajet</th>
-                                        <th className="px-4 py-3">Chauffeur</th>
-                                        <th className="px-4 py-3">Véhicule</th>
-                                        <th className="px-4 py-3">Status</th>
-                                        <th className="px-4 py-3 text-right">Montant</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y dark:divide-gray-700">
-                                    {recentTrips.length === 0 ? (
-                                        <tr><td colSpan={5} className="py-10 text-center text-gray-400 italic text-sm">Aucun trajet récent trouvé.</td></tr>
-                                    ) : recentTrips.map((trip: any) => (
-                                        <tr key={trip.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
-                                            <td className="px-6 py-4">
-                                                <div className="font-bold text-sm text-gray-800 dark:text-gray-200">{trip.clientName || 'Client Inconnu'}</div>
-                                                <div className="text-[10px] text-gray-500 truncate max-w-[150px]">{trip.startLocation} → {trip.endLocation}</div>
-                                            </td>
-                                            <td className="px-4 py-4">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-[10px] font-bold text-indigo-700 dark:text-indigo-300">
-                                                        {trip.driver?.name?.charAt(0) || 'D'}
-                                                    </div>
-                                                    <span className="text-xs font-medium dark:text-gray-300">{trip.driver?.name || '—'}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-4 text-xs dark:text-gray-400 font-mono">
-                                                {trip.vehicle?.immatriculation || '—'}
-                                            </td>
-                                            <td className="px-4 py-4">
-                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${trip.status === 'DONE' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                                                        trip.status === 'PENDING' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
-                                                            'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                                                    }`}>
-                                                    {trip.status}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-4 text-right font-black text-sm text-gray-800 dark:text-white">
-                                                {(trip.amount || trip.price || 0).toLocaleString()} <span className="text-[10px] font-normal opacity-60">MAD</span>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                        <div className="flex-1">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={monthlyRevenue}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f8fafc" />
+                                    <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} dy={10} />
+                                    <YAxis hide />
+                                    <Tooltip
+                                        contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 20px 50px rgba(0,0,0,0.1)', padding: '15px' }}
+                                        itemStyle={{ fontWeight: 800, color: '#1e293b' }}
+                                    />
+                                    <Line type="monotone" dataKey="total" stroke="#6366f1" strokeWidth={6} dot={{ r: 0 }} activeDot={{ r: 8, strokeWidth: 4, stroke: '#fff' }} />
+                                </LineChart>
+                            </ResponsiveContainer>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            {/* 3. Bottom Row: Activity Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-                {/* Financial Performance Chart */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                    <h3 className="font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5 text-indigo-500" />
-                        Évolution Financière
-                    </h3>
-                    <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={monthlyRevenue}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} dy={10} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} />
-                                <Tooltip
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                                    cursor={{ stroke: '#6366f1', strokeWidth: 2 }}
-                                />
-                                <Line type="monotone" dataKey="total" stroke="#6366f1" strokeWidth={4} dot={{ r: 4, fill: '#6366f1' }} activeDot={{ r: 8, stroke: '#fff', strokeWidth: 2 }} />
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-
-                {/* Driver Performance Table (Top 5) */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                    <h3 className="font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
-                        <Car className="w-5 h-5 text-purple-500" />
-                        Performance des Chauffeurs
-                    </h3>
-                    <div className="space-y-4">
-                        {driverStats.slice(0, 5).map((d: any, i: number) => (
-                            <div key={i} className="flex items-center gap-4">
-                                <div className="text-sm font-black text-gray-300 w-4">#{i + 1}</div>
-                                <div className="flex-1">
-                                    <div className="flex justify-between items-end mb-1">
-                                        <span className="text-sm font-bold text-gray-700 dark:text-gray-200">{d.driverName}</span>
-                                        <span className="text-xs font-medium text-gray-500">{d.tripCount} missions</span>
+                    {/* Operational Feed Card */}
+                    <div className="bg-white rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 border border-slate-100/50 flex flex-col h-[400px]">
+                        <div className="flex justify-between items-center mb-10">
+                            <div>
+                                <h3 className="text-xl font-black text-[#1e293b]">Missions Récentes</h3>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Dernières activités</p>
+                            </div>
+                            <button className="text-[10px] font-black text-orange-600 bg-orange-50 px-4 py-2 rounded-full hover:bg-orange-100 transition-all uppercase tracking-widest">Voir tout</button>
+                        </div>
+                        <div className="flex-1 space-y-6 overflow-y-auto custom-scrollbar pr-2">
+                            {recentTrips.length === 0 ? (
+                                <div className="h-full flex flex-col items-center justify-center opacity-30">
+                                    <Activity className="w-12 h-12 mb-2" />
+                                    <p className="text-xs font-bold uppercase tracking-widest">Aucune mission</p>
+                                </div>
+                            ) : recentTrips.slice(0, 5).map((trip: any) => (
+                                <div key={trip.id} className="flex items-center gap-5 group">
+                                    <div className="w-1.5 h-12 rounded-full bg-slate-100 group-hover:bg-indigo-500 transition-all"></div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="font-black text-sm text-slate-800 truncate">{trip.clientName || 'Client'}</div>
+                                        <div className="text-[10px] font-bold text-slate-400 truncate uppercase tracking-tight">{trip.startLocation} → {trip.endLocation}</div>
                                     </div>
-                                    <div className="w-full bg-gray-100 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-purple-500"
-                                            style={{ width: `${Math.min(100, (d.tripCount / (driverStats[0]?.tripCount || 1)) * 100)}%` }}
-                                        ></div>
+                                    <div className="text-right flex-shrink-0">
+                                        <div className="text-sm font-black text-slate-900">{(trip.amount || 0).toLocaleString()} MAD</div>
+                                        <div className={`text-[9px] uppercase font-black px-2 py-0.5 rounded-full ${trip.status === 'DONE' ? 'text-emerald-600 bg-emerald-50' :
+                                                trip.status === 'PENDING' ? 'text-amber-600 bg-amber-50' :
+                                                    'text-blue-600 bg-blue-50'
+                                            }`}>
+                                            {trip.status}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                        {driverStats.length === 0 && <p className="text-center py-10 text-gray-400 italic text-sm">Aucune donnée chauffeur.</p>}
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Bottom Row: Full Width List */}
+                <div className="bg-white rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-10 border border-slate-100/50">
+                    <div className="flex justify-between items-center mb-10">
+                        <div>
+                            <h3 className="text-2xl font-black text-[#1e293b]">Gestion de Flotte</h3>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-[3px] mt-1">Historique des trajets</p>
+                        </div>
+                        <div className="bg-slate-50 p-2 rounded-2xl flex gap-1">
+                            <div className="px-4 py-2 bg-white rounded-xl shadow-sm text-xs font-black text-indigo-600 cursor-pointer">Tous</div>
+                            <div className="px-4 py-2 hover:bg-white rounded-xl text-xs font-bold text-slate-400 cursor-pointer transition-all">Terminés</div>
+                        </div>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead className="text-[10px] font-black text-slate-400 uppercase tracking-[3px]">
+                                <tr>
+                                    <th className="pb-6 px-4">Client / Destination</th>
+                                    <th className="pb-6 px-4">Chauffeur</th>
+                                    <th className="pb-6 px-4">Véhicule</th>
+                                    <th className="pb-6 px-4 text-right">Montant</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-50">
+                                {recentTrips.slice(0, 8).map((trip: any) => (
+                                    <tr key={trip.id} className="hover:bg-slate-50/80 transition-all cursor-pointer group">
+                                        <td className="py-6 px-4">
+                                            <div className="font-black text-slate-800 group-hover:text-indigo-600 transition-colors uppercase tracking-tight">{trip.clientName || 'Client'}</div>
+                                            <div className="text-[10px] font-bold text-slate-400 mt-0.5">{trip.startLocation}</div>
+                                        </td>
+                                        <td className="py-6 px-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-[10px] font-black text-indigo-600">
+                                                    {trip.driver?.name?.charAt(0) || 'D'}
+                                                </div>
+                                                <span className="text-xs font-bold text-slate-600">{trip.driver?.name || '—'}</span>
+                                            </div>
+                                        </td>
+                                        <td className="py-6 px-4">
+                                            <div className="text-[10px] font-black text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 w-fit">
+                                                {trip.vehicle?.immatriculation || '—'}
+                                            </div>
+                                        </td>
+                                        <td className="py-6 px-4 text-right">
+                                            <div className="text-base font-black text-slate-900">{(trip.amount || 0).toLocaleString()} <span className="text-[10px] opacity-40 font-normal">MAD</span></div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            {/* RIGHT SIDEBAR Area (3 Columns) mirroring the reference image's card */}
+            <div className="lg:col-span-4 xl:col-span-3 space-y-8">
+
+                {/* Profile/Summary Card (Mirror of reference right card) */}
+                <div className="bg-white rounded-[2.5rem] shadow-[0_15px_50px_rgba(0,0,0,0.03)] p-10 border border-slate-100 flex flex-col items-center text-center sticky top-24">
+                    <div className="relative mb-8">
+                        <div className="w-32 h-32 rounded-[2.5rem] bg-slate-50 p-1 border-2 border-orange-500/20 overflow-hidden shadow-inner">
+                            <img
+                                src={data.companyProfile?.logo || "https://api.dicebear.com/7.x/shapes/svg?seed=Arwa"}
+                                alt="Logo"
+                                className="w-full h-full object-contain p-2"
+                            />
+                        </div>
+                        <div className="absolute bottom-[-10px] right-[-10px] bg-emerald-500 w-8 h-8 rounded-2xl border-4 border-white flex items-center justify-center text-white text-xs font-black shadow-lg">✓</div>
+                    </div>
+
+                    <h2 className="text-2xl font-black text-[#1e293b] mb-1">{data.companyProfile?.name || "ArwaPark"}</h2>
+                    <p className="text-[10px] font-black text-orange-500 uppercase tracking-[4px] mb-10">Premium Management</p>
+
+                    <div className="w-full space-y-8">
+                        <ProfileStat label="Fondé le" value="28 Jan 2024" icon="📅" color="bg-orange-50" />
+                        <ProfileStat label="Flotte" value={`${fleet.total} Véhicules`} icon="🚚" color="bg-indigo-50" />
+                        <ProfileStat label="Type" value="SaaS Corporate" icon="🏢" color="bg-emerald-50" />
+                    </div>
+
+                    <div className="w-full mt-10 pt-10 border-t border-slate-50">
+                        <h4 className="text-left text-[10px] font-black text-slate-400 mb-6 uppercase tracking-widest">Statut du Compte</h4>
+                        <div className="bg-slate-50 rounded-[2rem] p-6 text-left">
+                            <p className="text-xs text-slate-600 leading-relaxed font-bold italic">
+                                "Profil administrateur actif. Tous les services de gestion de parc sont opérationnels pour la société."
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Dark Card at bottom like reference */}
+                    <div className="w-full mt-8 p-8 bg-[#1e293b] rounded-[2.5rem] text-left text-white shadow-2xl shadow-slate-900/20 overflow-hidden relative group cursor-pointer hover:scale-[1.02] transition-all">
+                        <div className="relative z-10 space-y-1">
+                            <h5 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Performance</h5>
+                            <div className="text-3xl font-black">{fleet.total > 0 ? Math.round((fleet.active / fleet.total) * 100) : 0}%</div>
+                            <p className="text-[10px] font-bold text-slate-400 mt-2">Disponibilité temps réel</p>
+                        </div>
+                        <Activity className="absolute bottom-[-15px] right-[-15px] w-24 h-24 text-white opacity-[0.03] group-hover:rotate-12 transition-transform duration-700" />
                     </div>
                 </div>
 
@@ -188,57 +208,31 @@ export default function DashboardPage() {
     )
 }
 
-// Custom KPI Card
-function KPICard({ label, amount, count, icon, color }: any) {
-    const colors: any = {
-        indigo: 'from-indigo-500 to-indigo-600 shadow-indigo-200 dark:shadow-none',
-        emerald: 'from-emerald-500 to-emerald-600 shadow-emerald-200 dark:shadow-none',
-        amber: 'from-amber-500 to-amber-600 shadow-amber-200 dark:shadow-none',
-        blue: 'from-blue-500 to-blue-600 shadow-blue-200 dark:shadow-none',
-    }
+function BentoKPI({ label, amount, sub, color }: any) {
     return (
-        <div className="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col justify-between">
-            <div className="flex justify-between items-start mb-4">
-                <div className={`p-2 rounded-xl bg-gradient-to-br ${colors[color]} text-white shadow-lg`}>
-                    {React.cloneElement(icon as React.ReactElement, { className: 'w-5 h-5' })}
-                </div>
+        <div className="bg-white rounded-[2.5rem] shadow-[0_4px_25px_rgba(0,0,0,0.02)] p-10 border border-slate-100 flex flex-col justify-between hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 group relative overflow-hidden">
+            <div className={`w-14 h-14 ${color} rounded-2xl mb-10 flex items-center justify-center text-white shadow-2xl shadow-current/20 group-hover:scale-110 transition-transform duration-500`}>
+                <DollarSign className="w-7 h-7" />
             </div>
             <div>
-                <p className="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">{label}</p>
-                <div className="text-2xl font-black text-gray-800 dark:text-white">
-                    {amount !== undefined ? `${amount.toLocaleString()} MAD` : count}
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[3px] mb-2">{label}</p>
+                <h4 className="text-3xl font-black text-slate-900 mb-3 tracking-tighter">{(amount || 0).toLocaleString()} <span className="text-xs font-normal text-slate-400 ml-1">MAD</span></h4>
+                <div className="text-[9px] font-black text-slate-500 bg-slate-50 px-3 py-1.5 rounded-full w-fit group-hover:bg-indigo-500 group-hover:text-white transition-all duration-500 uppercase tracking-wider shadow-sm">
+                    {sub}
                 </div>
             </div>
+            <div className={`absolute top-0 right-0 w-32 h-32 ${color} opacity-[0.02] translate-x-10 -translate-y-10 rounded-full group-hover:scale-150 transition-transform duration-1000`}></div>
         </div>
     )
 }
 
-// Status Row for Fleet
-function StatusRow({ label, count, total, color }: any) {
-    const percentage = total > 0 ? (count / total) * 100 : 0
+function ProfileStat({ label, value, icon, color }: any) {
     return (
-        <div>
-            <div className="flex justify-between items-center text-xs mb-1">
-                <span className="text-gray-600 dark:text-gray-400 font-medium">{label}</span>
-                <span className="font-bold text-gray-800 dark:text-white">{count} ({Math.round(percentage)}%)</span>
-            </div>
-            <div className="w-full bg-gray-100 dark:bg-gray-700 h-1.5 rounded-full overflow-hidden">
-                <div className={`h-full ${color}`} style={{ width: `${percentage}%` }}></div>
-            </div>
-        </div>
-    )
-}
-
-// Simple Stat Card Component
-function StatCard({ label, count, icon: Icon, color }: any) {
-    return (
-        <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-3 transition-transform hover:-translate-y-1 duration-300">
-            <div className={`p-2.5 rounded-lg ${color} bg-opacity-10`}>
-                <Icon className={`w-5 h-5 ${color.replace('bg-', 'text-')}`} />
-            </div>
+        <div className="flex items-center gap-5 text-left group">
+            <div className={`w-12 h-12 rounded-[1.2rem] ${color} flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition-transform`}>{icon}</div>
             <div>
-                <p className="text-xs text-gray-500 font-medium">{label}</p>
-                <p className="text-lg font-black text-gray-800 dark:text-white">{count}</p>
+                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</div>
+                <div className="text-sm font-black text-slate-700 leading-tight mt-0.5">{value}</div>
             </div>
         </div>
     )
