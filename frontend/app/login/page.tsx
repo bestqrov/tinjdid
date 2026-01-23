@@ -82,115 +82,125 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-3 sm:p-4 overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-300 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-3xl opacity-30 animate-blob"></div>
-        <div className="absolute -bottom-32 left-0 w-96 h-96 bg-pink-300 dark:bg-pink-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-300 dark:bg-blue-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-      </div>
-
+    <div className="min-h-screen bg-[#f1f5f9] flex items-center justify-center p-4">
       {/* Login Card */}
-      <div className="relative w-full max-w-md px-4">
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-white/20 dark:border-gray-700/50 transform transition-all hover:scale-[1.01] duration-500">
-          {/* Header with Gradient */}
-          <div className="bg-gradient-to-r from-blue-600/90 to-purple-600/90 dark:from-blue-700/90 dark:to-purple-700/90 p-6 sm:p-8 text-white relative overflow-hidden">
-            <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px]"></div>
-            <div className="relative z-10 flex flex-col items-center">
-              <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-lg ring-4 ring-white/20 mb-3 transform hover:rotate-3 transition-transform duration-300">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 tracking-tight">ArwaPark</h1>
-              </div>
-            </div>
-            <p className="text-center text-blue-100 dark:text-blue-200 text-xs sm:text-sm mt-2">Gestion de Transport</p>
+      <div className="w-full max-w-[480px] bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200">
+
+        {/* Gradient Header */}
+        <div className="h-[240px] bg-gradient-to-br from-[#4f46e5] via-[#7c3aed] to-[#9333ea] flex flex-col items-center justify-center relative p-8">
+          {/* Logo Box */}
+          <div className="bg-white rounded-[1.8rem] px-8 py-5 shadow-2xl shadow-indigo-500/20 mb-6 transform transition-transform hover:scale-105">
+            <h1 className="text-4xl font-black tracking-tight text-[#4f46e5]">
+              ArwaPark
+            </h1>
           </div>
 
-          {/* Form Section */}
-          <form onSubmit={submit} className="p-4 sm:p-5">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1">Bienvenue</h2>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mb-3">Connectez-vous à votre compte</p>
+          {/* Header Subtitle */}
+          <p className="text-white/60 font-medium text-sm tracking-widest uppercase">
+            GESTION DE TRANSPORT TOURISTIQUE
+          </p>
+        </div>
 
-            {error && (
-              <div className="mb-3 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                <div className="text-red-600 dark:text-red-400 text-xs sm:text-sm">{error}</div>
-              </div>
-            )}
+        {/* Form Section */}
+        <div className="px-10 py-12">
+          <div className="mb-10">
+            <h2 className="text-[2rem] font-bold text-slate-800 leading-tight mb-2">
+              Bienvenue
+            </h2>
+            <p className="text-slate-500 text-lg">
+              Connectez-vous à votre compte
+            </p>
+          </div>
 
-            {/* Email Input */}
-            <div className="mb-3">
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {error && (
+            <div className="mb-8 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 font-medium animate-shake">
+              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={submit} className="space-y-8">
+            {/* Email Field */}
+            <div className="space-y-3">
+              <label className="text-lg font-bold text-slate-700 ml-1">
                 Email
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-4 w-4 text-gray-400" />
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                  <Mail className="h-6 w-6 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
                 </div>
                 <input
                   type="email"
-                  className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
+                  className="w-full pl-14 pr-5 py-4 bg-white border-2 border-slate-100 rounded-2xl focus:ring-0 focus:border-indigo-500 outline-none transition-all text-slate-900 text-lg placeholder:text-slate-300"
                   placeholder="exemple@email.com"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  autoComplete="off"
+                  autoComplete="email"
                   required
                 />
               </div>
             </div>
 
-            {/* Password Input */}
-            <div className="mb-3">
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {/* Password Field */}
+            <div className="space-y-3">
+              <label className="text-lg font-bold text-slate-700 ml-1">
                 Mot de passe
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-4 w-4 text-gray-400" />
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                  <Lock className="h-6 w-6 text-slate-400 group-focus-within:text-purple-600 transition-colors" />
                 </div>
                 <input
                   type="password"
-                  className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
+                  className="w-full pl-14 pr-5 py-4 bg-white border-2 border-slate-100 rounded-2xl focus:ring-0 focus:border-purple-500 outline-none transition-all text-slate-900 text-lg placeholder:text-slate-300"
                   placeholder="••••••••"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  autoComplete="new-password"
+                  autoComplete="current-password"
                   required
                 />
               </div>
             </div>
 
-            {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between mb-3">
-              <label className="flex items-center">
-                <input type="checkbox" className="w-3 h-3 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-                <span className="ml-1.5 text-xs text-gray-600 dark:text-gray-400">Se souvenir</span>
+            {/* Actions Row */}
+            <div className="flex items-center justify-between px-1">
+              <label className="flex items-center gap-3 group cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="w-5 h-5 rounded-md border-2 border-slate-300 text-indigo-600 focus:ring-0 cursor-pointer transition-all"
+                />
+                <span className="text-slate-500 font-medium text-lg group-hover:text-slate-700 transition-colors">
+                  Se souvenir
+                </span>
               </label>
-              <a href="/forgot-password" className="text-xs text-blue-600 dark:text-blue-400 hover:underline">
+              <a href="/forgot-password" virtual-href="/forgot-password" className="text-lg font-bold text-[#4f46e5] hover:text-[#4338ca] transition-colors">
                 Mot de passe oublié?
               </a>
             </div>
 
-            {/* Login Button */}
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2 sm:py-2.5 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              className="w-full bg-gradient-to-r from-[#3b82f6] to-[#a855f7] text-white font-bold py-5 rounded-[1.2rem] shadow-xl shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-4 disabled:opacity-50 disabled:cursor-not-allowed group text-xl"
             >
               {isLoading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span className="text-xs sm:text-sm">Connexion...</span>
+                  <div className="w-6 h-6 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
+                  <span>Vérification...</span>
                 </>
               ) : (
                 <>
-                  Se connecter
-                  <ArrowRight className="w-4 h-4" />
+                  <span>Se connecter</span>
+                  <ArrowRight className="w-6 h-6 group-hover:translate-x-1.5 transition-transform" />
                 </>
               )}
             </button>
           </form>
 
           {/* Footer */}
-          <div className="px-4 pb-3 sm:pb-4">
-            <p className="text-center text-xs text-gray-500 dark:text-gray-400">
+          <div className="mt-12 text-center">
+            <p className="text-slate-400 font-medium text-lg tracking-wide">
               © 2026 ArwaPark
             </p>
           </div>
@@ -198,28 +208,13 @@ export default function LoginPage() {
       </div>
 
       <style jsx>{`
-        @keyframes blob {
-          0% {
-            transform: translate(0px, 0px) scale(1);
-          }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
-          }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-          100% {
-            transform: translate(0px, 0px) scale(1);
-          }
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-4px); }
+          75% { transform: translateX(4px); }
         }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
+        .animate-shake {
+          animation: shake 0.4s ease-in-out;
         }
       `}</style>
     </div>
