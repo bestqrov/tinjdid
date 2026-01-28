@@ -3,8 +3,8 @@ import { ReactNode } from 'react'
 import ClientLayout from '../components/ClientLayout'
 
 export const metadata = {
-  title: 'ArwaPark',
-  description: 'ArwaPark - Gestion de parc automobile',
+  title: 'ArwaEduc',
+  description: 'ArwaEduc - Gestion de parc automobile',
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -525,7 +525,7 @@ model ActivityLog {
 
 model PlatformSettings {
   id                    String   @id @default(auto()) @map("_id") @db.ObjectId
-  platformName          String   @default("ArwaPark")
+  platformName          String   @default("ArwaEduc")
   platformLogo          String?
   supportEmail          String?
   defaultLanguage       String   @default("FR")

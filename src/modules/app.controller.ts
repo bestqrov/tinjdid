@@ -27,16 +27,13 @@ export class AppController {
   @Get('api')
   getApiInfo() {
     return {
-      name: 'ArwaPark SaaS API',
+      success: true,
+      message: 'ArwaEduc API Server',
       version: '1.0.0',
-      status: 'running',
-      timestamp: new Date().toISOString(),
       endpoints: {
-        auth: '/api/auth',
-        dashboard: '/api/dashboard',
-        seed: '/api/seed (Use once to initialize DB)'
+        health: '/health',
+        api: '/api/*',
       },
-      documentation: 'See API_DOCUMENTATION.md for complete API reference',
     }
   }
 

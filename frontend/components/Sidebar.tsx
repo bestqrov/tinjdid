@@ -11,6 +11,7 @@ export default function Sidebar() {
   const show = {
     dashboard: role === 'ADMIN',
     dashboardStaff: role === 'STAFF',
+    overview: role === 'ADMIN' || role === 'STAFF',
     trips: role === 'ADMIN' || role === 'STAFF' || role === 'DRIVER',
     quotes: role === 'ADMIN' || role === 'STAFF',
     invoices: role === 'ADMIN' || role === 'STAFF',
@@ -25,7 +26,8 @@ export default function Sidebar() {
     {
       title: 'MENU PRINCIPAL',
       items: [
-        { href: '/panel', label: 'Tableau de Bord', icon: '🏠', show: show.dashboard },
+        { href: '/panel', label: 'Tableau de Bord', icon: '🏠', show: show.dashboard || role === 'STAFF' },
+        { href: '/overview', label: 'Vue d\'ensemble', icon: '📊', show: show.overview },
         { href: '/dashboard-staff', label: 'Tableau Secrétaire', icon: '💼', show: show.dashboardStaff },
       ],
     },
@@ -46,9 +48,9 @@ export default function Sidebar() {
       ],
     },
     {
-      title: 'PREFERENCES',
+      title: 'DONNÉES',
       items: [
-        { href: '/charges', label: 'Charges', icon: '💳', show: show.charges },
+        { href: '/consommation/carburant', label: 'Consommation', icon: '⛽', show: show.charges },
         {
           href: role === 'DRIVER' ? '/settings-driver' : '/settings',
           label: 'Paramètres',
@@ -74,7 +76,7 @@ export default function Sidebar() {
         <div className="p-6 space-y-6 flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-lg">M</div>
-            <span className="text-white font-black tracking-tight text-lg uppercase">ArwaPark</span>
+            <span className="text-white font-black tracking-tight text-lg uppercase">ArwaEduc</span>
           </div>
 
           {/* User Profile Info (Reference style) */}
@@ -117,22 +119,18 @@ export default function Sidebar() {
             </div>
           ))}
 
-          {/* Special Consommation Button if needed - Simplified */}
-          <div className="space-y-2">
-            <h3 className="px-3 text-[10px] font-black text-slate-500 uppercase tracking-[2px]">DATA</h3>
-            <Link href="/consommation/carburant" className="flex items-center gap-3 py-2.5 px-3 rounded-xl hover:bg-white/5 text-slate-400 hover:text-white transition-all duration-200 group">
-              <span className="text-lg opacity-70 group-hover:opacity-100">⛽</span>
-              <span className="text-sm font-semibold">Consommation</span>
-            </Link>
-          </div>
         </nav>
 
         {/* Sidebar Footer: Logout (Orange Button) */}
         <div className="p-6 mt-auto">
           <button
             onClick={() => {
-              localStorage.removeItem('token')
+              localStorage.removeItem('access_token')
+              localStorage.removeItem('user')
+              localStorage.removeItem('companyId')
+              localStorage.removeItem('token') // For safety with legacy code
               localStorage.removeItem('refreshToken')
+              document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;"
               window.location.href = '/login'
             }}
             className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-2xl bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-black transition-all shadow-lg shadow-orange-500/20"
