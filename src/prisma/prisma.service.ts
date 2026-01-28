@@ -5,18 +5,10 @@ import { join } from 'path'
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
   constructor() {
-    let url = process.env.DATABASE_URL
-
-    // Auto-fix for MongoDB Atlas empty database name issue
-    if (url && (url.includes('mongodb.net/?') || url.endsWith('mongodb.net/'))) {
-      console.warn('⚠️ Detected missing database name in connection string. Auto-fixing...')
-      url = url.replace('mongodb.net/', 'mongodb.net/arwapark')
-    }
-
     super({
       datasources: {
         db: {
-          url,
+          url: process.env.DATABASE_URL,
         },
       },
     })
