@@ -9,6 +9,25 @@ if ! docker info > /dev/null 2>&1; then
     exit 1
 fi
 
+# Create .env.production if it doesn't exist
+if [ ! -f ".env.production" ]; then
+    echo "⚠️  Creating .env.production with default values..."
+    cat > .env.production << 'EOF'
+# Production Environment Configuration
+DATABASE_URL="file:./dev.db"
+
+# JWT Configuration (CHANGE IN PRODUCTION!)
+JWT_SECRET="your-super-secret-jwt-key-for-production"
+JWT_REFRESH_SECRET="your-super-secret-refresh-key-for-production"
+
+# Environment
+NODE_ENV="production"
+EOF
+    echo "✅ .env.production created successfully"
+else
+    echo "✅ .env.production found"
+fi
+
 # Generate package-lock.json if missing
 if [ ! -f "package-lock.json" ]; then
     echo "📦 Generating package-lock.json..."
