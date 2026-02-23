@@ -12,8 +12,8 @@ COPY package*.json ./
 COPY frontend/package*.json ./frontend/
 
 # Install dependencies
-RUN npm install
-RUN cd frontend && npm install
+RUN npm install --frozen-lockfile
+RUN cd frontend && npm install --frozen-lockfile
 
 # Copy source code
 COPY . .
@@ -24,7 +24,7 @@ RUN npx prisma generate
 # Build backend
 RUN npm run build
 
-# Build frontend
+# Build frontend  
 RUN cd frontend && npm run build
 
 # Stage 2: Production
@@ -43,8 +43,9 @@ COPY package*.json ./
 COPY frontend/package*.json ./frontend/
 
 # Install production dependencies only
-RUN npm ci --only=production
-RUN cd frontend && npm ci --only=production
+# Try npm ci first, fallback to npm install if lockfile is incompatible
+RUN npm ci --omit=dev || npm install --omit=dev
+RUN cd frontend && (npm ci --omit=dev || npm install --omit=dev)
 
 # Copy built artifacts from builder
 COPY --from=builder /app/dist ./dist
@@ -62,11 +63,17 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 # Copy Prisma schema (required for Prisma Client)
 COPY --from=builder /app/prisma ./prisma
 
+# Copy environment files
+COPY .env.production ./.env
+
 # Copy configuration files
 COPY frontend/next.config.js ./frontend/
 
-# Create uploads directory
-RUN mkdir -p uploads
+# Create necessary directories
+RUN mkdir -p uploads prisma
+
+# Run Prisma setup
+RUN npx prisma generate
 
 # Expose port
 EXPOSE 3000
