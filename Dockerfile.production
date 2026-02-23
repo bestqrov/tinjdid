@@ -63,8 +63,16 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 # Copy Prisma schema (required for Prisma Client)
 COPY --from=builder /app/prisma ./prisma
 
-# Copy environment files
-COPY .env.production ./.env
+# Copy environment files (with fallback)
+COPY .env.production* ./
+RUN if [ -f ".env.production" ]; then \
+        cp .env.production .env; \
+    else \
+        echo "DATABASE_URL=\"file:./dev.db\"" > .env && \
+        echo "JWT_SECRET=\"your-super-secret-jwt-key-for-production\"" >> .env && \
+        echo "JWT_REFRESH_SECRET=\"your-super-secret-refresh-key-for-production\"" >> .env && \
+        echo "NODE_ENV=\"production\"" >> .env; \
+    fi
 
 # Copy configuration files
 COPY frontend/next.config.js ./frontend/
