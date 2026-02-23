@@ -2,6 +2,9 @@ node_modules
 uploads/
 *.log
 .env
+.env.local
+.env.development
+.env.test
 dist/
 .DS_Store
 
@@ -12,4 +15,3 @@ out/
 
 # cache
 node_modules/
-.env*
