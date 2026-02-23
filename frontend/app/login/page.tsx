@@ -85,55 +85,55 @@ export default function LoginPage() {
       <div className="w-full max-w-[420px] bg-white rounded-[2rem] sm:rounded-[3rem] shadow-[0_25px_80px_rgba(0,0,0,0.12)] overflow-hidden border border-white/20 backdrop-blur-3xl relative z-10 flex flex-col group transition-all duration-700 hover:shadow-[0_40px_100px_rgba(79,70,229,0.15)]">
 
         {/* Premium Header: Mesh Gradient style */}
-        <div className="h-[180px] sm:h-[220px] bg-gradient-to-br from-[#4f46e5] via-[#7c3aed] to-[#9333ea] flex flex-col items-center justify-center relative px-6 sm:px-8 pt-3 sm:pt-4 overflow-hidden">
+        <div className="h-[140px] sm:h-[160px] bg-gradient-to-br from-[#4f46e5] via-[#7c3aed] to-[#9333ea] flex flex-col items-center justify-center relative px-6 sm:px-8 pt-2 sm:pt-3 overflow-hidden">
 
           {/* Animated Mesh Pattern inside header */}
           <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_50%)] animate-pulse"></div>
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-3xl rounded-full translate-x-10 -translate-y-10 group-hover:scale-150 transition-transform duration-1000"></div>
 
           {/* Logo Container: High-end Glassmorphism Card */}
-          <div className="bg-white/95 saturate-150 rounded-[1.8rem] sm:rounded-[2.2rem] px-6 sm:px-10 py-4 sm:py-6 shadow-[0_25px_50px_rgba(0,0,0,0.15)] mb-4 sm:mb-6 transform transition-all duration-500 hover:scale-105 hover:-rotate-1 border border-white/50 relative z-20">
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight flex items-center gap-0.5">
+          <div className="bg-white/95 saturate-150 rounded-[1.5rem] sm:rounded-[2rem] px-4 sm:px-8 py-3 sm:py-4 shadow-[0_25px_50px_rgba(0,0,0,0.15)] mb-3 sm:mb-4 transform transition-all duration-500 hover:scale-105 hover:-rotate-1 border border-white/50 relative z-20">
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight flex items-center gap-0.5">
               <span className="text-[#3b82f6] drop-shadow-sm">Arwa</span>
               <span className="text-[#a855f7] drop-shadow-sm">Park</span>
             </h1>
-            <div className="absolute -bottom-1 sm:-bottom-2 -right-1 sm:-right-2 w-6 h-6 sm:w-8 sm:h-8 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-lg border-2 border-white scale-75 rotate-12">
-              <span className="text-white text-[8px] sm:text-[10px] font-black">TM</span>
+            <div className="absolute -bottom-1 -right-1 sm:-right-2 w-5 h-5 sm:w-6 sm:h-6 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-lg border-2 border-white scale-75 rotate-12">
+              <span className="text-white text-[7px] sm:text-[8px] font-black">TM</span>
             </div>
           </div>
 
           {/* Subtitle with Ultra-Transparent blur */}
-          <div className="bg-white/15 backdrop-blur-xl px-4 sm:px-7 py-1.5 sm:py-2.5 rounded-full border border-white/20 shadow-sm transition-all hover:bg-white/20">
-            <p className="text-white font-black text-[8px] sm:text-[10px] tracking-[4px] sm:tracking-[6px] uppercase opacity-95">
+          <div className="bg-white/15 backdrop-blur-xl px-3 sm:px-5 py-1 sm:py-2 rounded-full border border-white/20 shadow-sm transition-all hover:bg-white/20">
+            <p className="text-white font-black text-[7px] sm:text-[9px] tracking-[3px] sm:tracking-[5px] uppercase opacity-95">
               Gestion de transport
             </p>
           </div>
         </div>
 
         {/* Form Content Section */}
-        <div className="px-6 py-6 sm:px-10 sm:py-8 md:px-12">
-          <div className="mb-6 sm:mb-8 text-left space-y-1 sm:space-y-2">
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-none bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600">
+        <div className="px-5 py-4 sm:px-8 sm:py-5">
+          <div className="mb-4 sm:mb-5 text-left space-y-1">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-none bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600">
               Bienvenue
             </h2>
-            <p className="text-slate-400 text-sm sm:text-base font-bold tracking-tight">
+            <p className="text-slate-400 text-xs sm:text-sm font-bold tracking-tight">
               Pro-Level Management Dashboard
             </p>
           </div>
 
           {error && (
-            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-rose-50 border border-rose-100 rounded-[1.2rem] sm:rounded-[1.5rem] flex items-center gap-3 sm:gap-4 text-rose-600 font-bold animate-shake shadow-sm">
-              <div className="w-1 h-6 sm:w-1.5 sm:h-8 bg-rose-500 rounded-full"></div>
+            <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 bg-rose-50 border border-rose-100 rounded-[1rem] sm:rounded-[1.2rem] flex items-center gap-2.5 sm:gap-3 text-rose-600 font-bold animate-shake shadow-sm">
+              <div className="w-1 h-5 sm:w-1.5 sm:h-6 bg-rose-500 rounded-full"></div>
               <div className="flex-1">
-                <p className="text-[10px] sm:text-xs uppercase tracking-widest opacity-60 mb-0.5 font-black">Erreur</p>
-                <p className="text-xs sm:text-sm">{error}</p>
+                <p className="text-[9px] sm:text-[10px] uppercase tracking-widest opacity-60 mb-0.5 font-black">Erreur</p>
+                <p className="text-[11px] sm:text-xs">{error}</p>
               </div>
             </div>
           )}
 
-          <form onSubmit={submit} className="space-y-4 sm:space-y-5">
+          <form onSubmit={submit} className="space-y-3 sm:space-y-4">
             {/* Input Groups: Refined and Polished */}
-            <div className="space-y-1 sm:space-y-2 group">
+            <div className="space-y-1 group">
               <div className="flex justify-between items-center ml-1">
                 <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
                   Email Professionnel
@@ -145,7 +145,7 @@ export default function LoginPage() {
                 </div>
                 <input
                   type="email"
-                  className="w-full pl-12 sm:pl-16 pr-4 sm:pr-6 py-3 sm:py-4 bg-slate-50/50 border border-slate-100 rounded-[1.5rem] sm:rounded-[1.8rem] focus:ring-[4px] sm:focus:ring-[6px] focus:ring-indigo-500/5 focus:border-indigo-500 focus:bg-white outline-none transition-all text-slate-800 font-bold text-base sm:text-lg placeholder:text-slate-200 shadow-inner"
+                  className="w-full pl-11 sm:pl-14 pr-3 sm:pr-5 py-2.5 sm:py-3 bg-slate-50/50 border border-slate-100 rounded-[1.3rem] sm:rounded-[1.5rem] focus:ring-[3px] sm:focus:ring-[4px] focus:ring-indigo-500/5 focus:border-indigo-500 focus:bg-white outline-none transition-all text-slate-800 font-bold text-sm sm:text-base placeholder:text-slate-200 shadow-inner"
                   placeholder="votre@agence.com"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
@@ -167,7 +167,7 @@ export default function LoginPage() {
                 </div>
                 <input
                   type="password"
-                  className="w-full pl-12 sm:pl-16 pr-4 sm:pr-6 py-3 sm:py-4 bg-slate-50/50 border border-slate-100 rounded-[1.5rem] sm:rounded-[1.8rem] focus:ring-[4px] sm:focus:ring-[6px] focus:ring-purple-500/5 focus:border-purple-500 focus:bg-white outline-none transition-all text-slate-800 font-bold text-base sm:text-lg placeholder:text-slate-200 shadow-inner"
+                  className="w-full pl-11 sm:pl-14 pr-3 sm:pr-5 py-2.5 sm:py-3 bg-slate-50/50 border border-slate-100 rounded-[1.3rem] sm:rounded-[1.5rem] focus:ring-[3px] sm:focus:ring-[4px] focus:ring-purple-500/5 focus:border-purple-500 focus:bg-white outline-none transition-all text-slate-800 font-bold text-sm sm:text-base placeholder:text-slate-200 shadow-inner"
                   placeholder="••••••••"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
@@ -198,35 +198,35 @@ export default function LoginPage() {
               </a>
             </div>
 
-            {/* Submit Button: The Wow Factor */}
+            {/* Submit Button: Compact and Medium Sized */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-slate-900 text-white font-black py-4 sm:py-5 rounded-[1.5rem] sm:rounded-[2rem] shadow-[0_20px_40px_rgba(0,0,0,0.1)] hover:shadow-[0_25px_50px_rgba(79,70,229,0.25)] hover:bg-[#1e1b4b] active:scale-[0.97] transition-all flex items-center justify-center gap-3 sm:gap-4 disabled:opacity-50 disabled:cursor-not-allowed group text-base sm:text-lg mt-4 sm:mt-6 relative overflow-hidden"
+              className="w-full bg-slate-900 text-white font-black py-2.5 sm:py-3 rounded-[1.3rem] sm:rounded-[1.5rem] shadow-[0_15px_30px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_40px_rgba(79,70,229,0.25)] hover:bg-[#1e1b4b] active:scale-[0.97] transition-all flex items-center justify-center gap-2.5 sm:gap-3 disabled:opacity-50 disabled:cursor-not-allowed group text-sm sm:text-base mt-3 sm:mt-4 relative overflow-hidden"
             >
               {/* Internal Shimmer effect */}
               <div className="absolute inset-0 w-1/2 h-full bg-white/5 skew-x-[-20deg] -translate-x-full group-hover:animate-shimmer"></div>
 
               {isLoading ? (
                 <>
-                  <div className="w-5 h-5 sm:w-6 sm:h-6 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
-                  <span className="tracking-tighter uppercase text-xs sm:text-sm font-black">Authentification...</span>
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
+                  <span className="tracking-tighter uppercase text-[11px] sm:text-xs font-black">Authentification...</span>
                 </>
               ) : (
                 <>
-                  <span className="uppercase tracking-[1px] sm:tracking-[2px] text-xs sm:text-sm font-black">Accéder au Parc</span>
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-2xl bg-white/10 flex items-center justify-center group-hover:bg-indigo-500 transition-colors duration-500">
-                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                  <span className="uppercase tracking-[1px] text-[11px] sm:text-xs font-black">Accéder au Parc</span>
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-2xl bg-white/10 flex items-center justify-center group-hover:bg-indigo-500 transition-colors duration-500">
+                    <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </>
               )}
             </button>
           </form>
 
-          {/* Luxury Footer */}
-          <div className="mt-6 sm:mt-8 text-center space-y-2 sm:space-y-3">
-            <div className="w-8 h-0.5 sm:w-12 sm:h-1 bg-slate-100 mx-auto rounded-full"></div>
-            <p className="text-slate-300 font-bold text-[10px] sm:text-xs uppercase tracking-[3px] sm:tracking-[5px] flex items-center justify-center gap-2">
+          {/* Compact Footer */}
+          <div className="mt-4 sm:mt-5 text-center space-y-1.5 sm:space-y-2">
+            <div className="w-6 h-0.5 sm:w-8 sm:h-0.5 bg-slate-100 mx-auto rounded-full"></div>
+            <p className="text-slate-300 font-bold text-[9px] sm:text-[10px] uppercase tracking-[2px] sm:tracking-[3px] flex items-center justify-center gap-2">
               © 2026 ArwaPark Professional
             </p>
           </div>
