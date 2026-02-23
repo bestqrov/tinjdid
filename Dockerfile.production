@@ -1,0 +1,75 @@
+
+# Stage 1: Builder
+FROM node:20-slim AS builder
+
+WORKDIR /app
+
+# Install OpenSSL (required for Prisma on slim images)
+RUN apt-get update -y && apt-get install -y openssl
+
+# Copy package files
+COPY package*.json ./
+COPY frontend/package*.json ./frontend/
+
+# Install dependencies
+RUN npm install
+RUN cd frontend && npm install
+
+# Copy source code
+COPY . .
+
+# Generate Prisma Client
+RUN npx prisma generate
+
+# Build backend
+RUN npm run build
+
+# Build frontend
+RUN cd frontend && npm run build
+
+# Stage 2: Production
+FROM node:20-slim
+
+# Set production environment
+ENV NODE_ENV=production
+
+WORKDIR /app
+
+# Install OpenSSL (required for Prisma on slim images)
+RUN apt-get update -y && apt-get install -y openssl
+
+# Copy package files
+COPY package*.json ./
+COPY frontend/package*.json ./frontend/
+
+# Install production dependencies only
+RUN npm ci --only=production
+RUN cd frontend && npm ci --only=production
+
+# Copy built artifacts from builder
+COPY --from=builder /app/dist ./dist
+# Copy Next.js standard build output
+COPY --from=builder /app/frontend/.next ./frontend/.next
+COPY --from=builder /app/frontend/public ./frontend/public
+# Copy Next.js source files (required for custom server)
+COPY --from=builder /app/frontend/app ./frontend/app
+COPY --from=builder /app/frontend/components ./frontend/components
+COPY --from=builder /app/frontend/lib ./frontend/lib
+COPY --from=builder /app/frontend/marketing ./frontend/marketing
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+
+# Copy Prisma schema (required for Prisma Client)
+COPY --from=builder /app/prisma ./prisma
+
+# Copy configuration files
+COPY frontend/next.config.js ./frontend/
+
+# Create uploads directory
+RUN mkdir -p uploads
+
+# Expose port
+EXPOSE 3000
+
+# Start application
+CMD ["npm", "run", "start"]
