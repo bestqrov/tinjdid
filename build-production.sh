@@ -11,10 +11,11 @@ fi
 
 # Create .env.production if it doesn't exist
 if [ ! -f ".env.production" ]; then
-    echo "⚠️  Creating .env.production with default values..."
+    echo "⚠️  Creating .env.production with default PostgreSQL values..."
     cat > .env.production << 'EOF'
 # Production Environment Configuration
-DATABASE_URL="file:./dev.db"
+# IMPORTANT: Replace with your actual PostgreSQL URL
+DATABASE_URL="postgresql://username:password@your-db-host:5432/arwapark_prod"
 
 # JWT Configuration (CHANGE IN PRODUCTION!)
 JWT_SECRET="your-super-secret-jwt-key-for-production"
@@ -24,6 +25,7 @@ JWT_REFRESH_SECRET="your-super-secret-refresh-key-for-production"
 NODE_ENV="production"
 EOF
     echo "✅ .env.production created successfully"
+    echo "⚠️  IMPORTANT: Update DATABASE_URL with your PostgreSQL connection string!"
 else
     echo "✅ .env.production found"
 fi
