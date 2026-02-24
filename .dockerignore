@@ -4,6 +4,10 @@ npm-debug.log
 yarn-error.log
 .npm
 
+# Platform-specific binaries (Sharp cross-platform fix)
+node_modules/@img/sharp-darwin-*
+node_modules/@img/sharp-libvips-darwin-*
+
 # Build output
 dist
 .next

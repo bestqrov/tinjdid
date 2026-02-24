@@ -47,6 +47,9 @@ COPY frontend/package*.json ./frontend/
 RUN npm ci --omit=dev || npm install --omit=dev
 RUN cd frontend && (npm ci --omit=dev || npm install --omit=dev)
 
+# Fix Sharp for Linux platform - rebuild for correct architecture
+RUN npm rebuild sharp --include=optional || npm install --include=optional sharp
+
 # Copy built artifacts from builder
 COPY --from=builder /app/dist ./dist
 # Copy Next.js standard build output
